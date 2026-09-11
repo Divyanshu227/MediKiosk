@@ -54,7 +54,7 @@ export const KioskHome: React.FC = () => {
               Patient Check-in & Symptom Intake
             </h1>
             <p className="mt-1 text-sm text-slate-600">
-              Record symptoms in your preferred Indian language before seeing the doctor.
+              Tell the kiosk your symptoms in your language, and scan old records — before you see the doctor.
             </p>
           </div>
 
@@ -82,7 +82,7 @@ export const KioskHome: React.FC = () => {
             <div>
               <div className="text-lg font-bold">Start New Intake</div>
               <p className="text-xs text-teal-100 mt-0.5">
-                Begin voice questionnaire in your regional language
+                Speak in your language — or type if you prefer
               </p>
             </div>
           </button>
@@ -113,7 +113,7 @@ export const KioskHome: React.FC = () => {
           </div>
           <div className="flex items-center space-x-2.5 p-2 rounded-lg bg-slate-50">
             <Clock className="w-4 h-4 text-teal-700 shrink-0" />
-            <span>Average intake takes ~2 mins</span>
+            <span>Doctor reviews your summary in under 2 mins</span>
           </div>
           <div className="flex items-center space-x-2.5 p-2 rounded-lg bg-slate-50">
             <Stethoscope className="w-4 h-4 text-teal-700 shrink-0" />

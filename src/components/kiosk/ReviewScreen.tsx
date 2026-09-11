@@ -282,7 +282,7 @@ export const ReviewScreen: React.FC = () => {
           <div>
             <p className="font-bold text-xs">ABDM & DPDP Act 2023 Digital Clinical Summary</p>
             <p className="text-[11px] text-teal-800 mt-0.5">
-              This structured clinical record will be automatically formatted and transferred into the Doctor's EMR consultation queue.
+              This structured record will be sent to the doctor's queue before you walk in.
             </p>
           </div>
         </div>

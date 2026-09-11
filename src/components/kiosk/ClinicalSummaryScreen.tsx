@@ -286,7 +286,7 @@ export const ClinicalSummaryScreen: React.FC = () => {
           className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-semibold text-xs sm:text-sm shadow-sm transition-all flex items-center justify-center space-x-2 cursor-pointer"
         >
           <Send className="w-3.5 h-3.5" />
-          <span>{isSent ? 'Transmitting to EMR...' : 'Open Doctor Consultation Portal (Step 5)'}</span>
+          <span>{isSent ? 'Transmitting to EMR...' : 'Send to Doctor & Open Consultation Portal'}</span>
         </button>
       </div>
 

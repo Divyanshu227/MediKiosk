@@ -116,7 +116,7 @@ export const LanguageSelection: React.FC = () => {
                 Selected Language: <span className="text-teal-800">{selectedLang.name} ({selectedLang.nativeName})</span>
               </div>
               <p className="text-[11px] text-slate-500">
-                Questions will be read aloud and transcribed in this language.
+                Questions play in this language; your spoken answers are transcribed in it.
               </p>
             </div>
           </div>

@@ -105,11 +105,11 @@ export const DoctorDashboard: React.FC = () => {
 
         <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-sm">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Avg Consultation Saved</span>
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Routine Intake Time Saved</span>
             <Clock className="w-4 h-4 text-slate-400" />
           </div>
-          <div className="text-2xl font-bold text-emerald-700">~6.5 mins</div>
-          <p className="text-[11px] text-slate-500 mt-0.5">Per patient intake efficiency</p>
+          <div className="text-2xl font-bold text-emerald-700">7+ mins</div>
+          <p className="text-[11px] text-slate-500 mt-0.5">Saved per patient consultation</p>
         </div>
 
         <div className="p-3.5 rounded-xl bg-teal-800 text-white shadow-sm">
