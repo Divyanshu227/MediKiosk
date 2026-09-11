@@ -13,6 +13,7 @@ import { LanguageSelection } from './components/kiosk/LanguageSelection';
 import { ConsentScreen } from './components/kiosk/ConsentScreen';
 import { VoiceIntakeScreen } from './components/kiosk/VoiceIntakeScreen';
 import { AIConversationScreen } from './components/kiosk/AIConversationScreen';
+import { DocumentScannerScreen } from './components/kiosk/DocumentScannerScreen';
 import { ReviewScreen } from './components/kiosk/ReviewScreen';
 import { ClinicalSummaryScreen } from './components/kiosk/ClinicalSummaryScreen';
 
@@ -56,6 +57,7 @@ const MainAppContent: React.FC = () => {
             {currentScreen === 'consent' && <ConsentScreen />}
             {currentScreen === 'voice-intake' && <VoiceIntakeScreen />}
             {currentScreen === 'ai-conversation' && <AIConversationScreen />}
+            {currentScreen === 'document-scanner' && <DocumentScannerScreen />}
             {currentScreen === 'review' && <ReviewScreen />}
             {currentScreen === 'clinical-summary' && <ClinicalSummaryScreen />}
           </div>

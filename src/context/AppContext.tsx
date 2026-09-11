@@ -5,9 +5,14 @@ import {
   Patient, 
   ClinicalInfo, 
   Message, 
-  AccessibilitySettings 
+  AccessibilitySettings,
+  ClinicalDepartment,
+  MedicalDocument,
+  AbhaProfile,
+  AyushAssessment,
+  FhirResourceBundle
 } from '../types';
-import { INITIAL_PATIENTS, SUPPORTED_LANGUAGES } from '../data/mockData';
+import { INITIAL_PATIENTS, SUPPORTED_LANGUAGES, SAMPLE_SCAN_TEMPLATES } from '../data/mockData';
 
 interface AppContextType {
   currentScreen: ScreenType;
@@ -15,12 +20,28 @@ interface AppContextType {
   navigateBack: () => void;
   screenHistory: ScreenType[];
 
+  clinicalDepartment: ClinicalDepartment;
+  setClinicalDepartment: (dept: ClinicalDepartment) => void;
+
   activePatient: Patient;
   setActivePatient: React.Dispatch<React.SetStateAction<Patient>>;
   updateActiveClinicalInfo: (updates: Partial<ClinicalInfo>) => void;
+  updateAyushAssessment: (updates: Partial<AyushAssessment>) => void;
   addMessageToActivePatient: (msg: Omit<Message, 'id' | 'timestamp'>) => void;
   resetPatientFlow: () => void;
   loadExistingPatient: (patientId: string) => boolean;
+
+  // Medical Document Intelligence (Module B)
+  documents: MedicalDocument[];
+  addScannedDocument: (doc: MedicalDocument) => void;
+  removeDocument: (docId: string) => void;
+  isOcrScanning: boolean;
+  simulateOcrScan: (templateId?: string) => Promise<void>;
+
+  // ABDM / ABHA Profile (Module D)
+  isAbhaVerified: boolean;
+  verifyAbhaProfile: (profile: AbhaProfile) => void;
+  generateFhirBundle: () => FhirResourceBundle;
 
   currentLanguage: LanguageCode;
   setCurrentLanguage: (lang: LanguageCode) => void;
@@ -56,30 +77,47 @@ interface AppContextType {
 
 const DEFAULT_PATIENT_INFO: Patient = {
   id: 'P-1024',
+  tokenNumber: 'A-104',
   name: 'Rajesh Kumar',
   age: 54,
   gender: 'Male',
+  department: 'allopathy',
   language: 'hi',
   languageName: 'Hindi (हिन्दी)',
   chiefComplaint: 'Fever and headache',
   status: 'In Progress',
   priority: 'Normal',
   time: 'Just now',
-  lastVisit: '18 Aug 2026',
+  lastVisit: '14 May 2026',
   intakeTimestamp: 'Just now',
   doctorReviewed: false,
+  abhaProfile: {
+    abhaId: 'rajesh.kumar54@abdm',
+    abhaNumber: '91-4829-1039-4821',
+    name: 'Rajesh Kumar',
+    gender: 'Male',
+    dob: '14-06-1972',
+    mobile: '+91 98765 43210',
+    address: 'House 42, Sector 14, Rohini, New Delhi 110085',
+    isLinked: true,
+    kycVerified: true
+  },
   clinicalInfo: {
-    chiefComplaint: 'Fever and headache',
+    chiefComplaint: 'Fever and headache for 3 days',
     duration: '3 days',
     severity: 'Moderate',
-    temperature: '101.0°F',
-    associatedSymptoms: ['Headache (frontal)'],
+    temperature: '101.4°F',
+    associatedSymptoms: ['Headache (frontal)', 'Body malaise'],
     deniedSymptoms: ['Cough', 'Chest pain', 'Breathing difficulty', 'Vomiting'],
     medicationsTaken: ['Paracetamol 650mg'],
-    allergies: 'Not reported / None known',
-    existingConditions: ['Hypertension'],
-    notes: 'Intake recorded in Hindi via speech interface.'
+    allergies: 'No known drug allergies reported',
+    existingConditions: ['Type 2 Diabetes Mellitus', 'Hypertension'],
+    notes: 'Intake recorded in Hindi via speech and touch interface.'
   },
+  documents: [
+    SAMPLE_SCAN_TEMPLATES[0],
+    SAMPLE_SCAN_TEMPLATES[1]
+  ],
   conversation: []
 };
 
@@ -88,10 +126,13 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentScreen, setCurrentScreenState] = useState<ScreenType>('kiosk-home');
   const [screenHistory, setScreenHistory] = useState<ScreenType[]>(['kiosk-home']);
+  const [clinicalDepartment, setClinicalDepartmentState] = useState<ClinicalDepartment>('allopathy');
   const [currentLanguage, setCurrentLanguageState] = useState<LanguageCode>('hi');
   const [patientQueue, setPatientQueue] = useState<Patient[]>(INITIAL_PATIENTS);
   const [activePatient, setActivePatient] = useState<Patient>(DEFAULT_PATIENT_INFO);
   const [selectedDoctorPatient, setSelectedDoctorPatient] = useState<Patient | null>(INITIAL_PATIENTS[0]);
+  const [isOcrScanning, setIsOcrScanning] = useState(false);
+  const [isAbhaVerified, setIsAbhaVerified] = useState(true);
 
   const [accessibility, setAccessibility] = useState<AccessibilitySettings>({
     largeText: false,
@@ -119,6 +160,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setScreenHistory(prev => [...prev, screen]);
     setCurrentScreenState(screen);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const setClinicalDepartment = (dept: ClinicalDepartment) => {
+    setClinicalDepartmentState(dept);
+    setActivePatient(prev => ({
+      ...prev,
+      department: dept,
+      tokenNumber: dept === 'ayush' ? `AY-${Math.floor(200 + Math.random() * 100)}` : `A-${Math.floor(100 + Math.random() * 100)}`
+    }));
   };
 
   const navigateBack = () => {
@@ -161,6 +211,34 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }));
   };
 
+  const updateAyushAssessment = (updates: Partial<AyushAssessment>) => {
+    setActivePatient(prev => ({
+      ...prev,
+      ayushAssessment: prev.ayushAssessment ? { ...prev.ayushAssessment, ...updates } : {
+        prakriti: 'Vata-Kapha',
+        vikriti: 'Vata Pradhana Tridosha imbalance with Ama',
+        agni: 'Manda',
+        koshtha: 'Krura',
+        sara: 'Madhyama',
+        samhanana: 'Medium',
+        satmya: 'Katu-Tikta Rasa Satmya',
+        sattva: 'Madhyama (Moderate)',
+        aharaShakti: 'Abhyavaharana & Jarana (High/Moderate/Low)',
+        vyayamaShakti: 'Low',
+        aharaVihara: {
+          dietType: 'Vegetarian',
+          mealTiming: 'Irregular',
+          waterIntake: '1.2 Liters / day',
+          sleepPattern: 'Disturbed due to pain',
+          stressLevel: 'Moderate'
+        },
+        nidanaFactors: ['Sheetahara (Cold food/water)', 'Daytime sleep'],
+        sampraptiSummary: 'Vata-Kapha vitiation localized in joint spaces.',
+        ...updates
+      }
+    }));
+  };
+
   const addMessageToActivePatient = (msg: Omit<Message, 'id' | 'timestamp'>) => {
     const timeStr = new Intl.DateTimeFormat('en-US', {
       hour: '2-digit',
@@ -180,8 +258,105 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }));
   };
 
+  const addScannedDocument = (doc: MedicalDocument) => {
+    setActivePatient(prev => ({
+      ...prev,
+      documents: [doc, ...prev.documents]
+    }));
+    showToast(`Document "${doc.title}" digitized and attached.`);
+  };
+
+  const removeDocument = (docId: string) => {
+    setActivePatient(prev => ({
+      ...prev,
+      documents: prev.documents.filter(d => d.id !== docId)
+    }));
+    showToast('Document removed from current intake session.');
+  };
+
+  const simulateOcrScan = async (templateId?: string) => {
+    setIsOcrScanning(true);
+    await new Promise(r => setTimeout(r, 1600));
+    
+    const chosenTemplate = SAMPLE_SCAN_TEMPLATES.find(t => t.id === templateId) || SAMPLE_SCAN_TEMPLATES[0];
+    const newDoc: MedicalDocument = {
+      ...chosenTemplate,
+      id: `doc-${Date.now()}`,
+      isUploadedByPatient: true
+    };
+
+    addScannedDocument(newDoc);
+    setIsOcrScanning(false);
+  };
+
+  const verifyAbhaProfile = (profile: AbhaProfile) => {
+    setIsAbhaVerified(true);
+    setActivePatient(prev => ({
+      ...prev,
+      name: profile.name,
+      abhaProfile: profile
+    }));
+    showToast(`ABHA ID ${profile.abhaId} verified successfully via ABDM.`);
+  };
+
+  const generateFhirBundle = (): FhirResourceBundle => {
+    const bundleData = {
+      resourceType: 'Bundle',
+      id: `fhir-bundle-${activePatient.id}`,
+      type: 'collection',
+      timestamp: new Date().toISOString(),
+      entry: [
+        {
+          resource: {
+            resourceType: 'Patient',
+            id: activePatient.id,
+            identifier: [
+              { system: 'https://healthid.ndhm.gov.in', value: activePatient.abhaProfile?.abhaId || 'ABHA-NOT-LINKED' }
+            ],
+            name: [{ text: activePatient.name }],
+            gender: activePatient.gender.toLowerCase(),
+            birthDate: activePatient.abhaProfile?.dob || '1975-01-01'
+          }
+        },
+        {
+          resource: {
+            resourceType: 'Encounter',
+            status: 'in-progress',
+            class: { code: 'AMB', display: 'Ambulatory OPD' },
+            serviceType: { text: activePatient.department === 'ayush' ? 'AYUSH Kayachikitsa' : 'General Medicine' }
+          }
+        },
+        {
+          resource: {
+            resourceType: 'Condition',
+            clinicalStatus: { coding: [{ code: 'active' }] },
+            code: { text: activePatient.clinicalInfo.chiefComplaint }
+          }
+        },
+        ...activePatient.documents.map(doc => ({
+          resource: {
+            resourceType: 'DocumentReference',
+            id: doc.id,
+            status: 'current',
+            type: { text: doc.title },
+            date: doc.date
+          }
+        }))
+      ]
+    };
+
+    return {
+      resourceType: 'Bundle',
+      id: `fhir-bundle-${activePatient.id}`,
+      type: 'collection',
+      timestamp: new Date().toISOString(),
+      totalEntries: bundleData.entry.length,
+      fhirJson: JSON.stringify(bundleData, null, 2)
+    };
+  };
+
   const loadExistingPatient = (patientId: string): boolean => {
-    const found = patientQueue.find(p => p.id.toUpperCase() === patientId.trim().toUpperCase());
+    const found = patientQueue.find(p => p.id.toUpperCase() === patientId.trim().toUpperCase() || p.tokenNumber.toUpperCase() === patientId.trim().toUpperCase());
     if (found) {
       setActivePatient({
         ...found,
@@ -189,6 +364,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         time: 'Just now'
       });
       setCurrentLanguageState(found.language);
+      setClinicalDepartmentState(found.department || 'allopathy');
       return true;
     }
     return false;
@@ -196,12 +372,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const resetPatientFlow = () => {
     const newId = `P-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newToken = clinicalDepartment === 'ayush' ? `AY-${Math.floor(200 + Math.random() * 100)}` : `A-${Math.floor(100 + Math.random() * 100)}`;
+    
     setActivePatient({
       ...DEFAULT_PATIENT_INFO,
       id: newId,
+      tokenNumber: newToken,
       name: 'New Patient',
       time: 'Just now',
       status: 'In Progress',
+      department: clinicalDepartment,
+      documents: [],
       conversation: []
     });
     setScreenHistory(['kiosk-home']);
@@ -209,12 +390,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const sendActivePatientToDoctor = () => {
+    const fhir = generateFhirBundle();
+    const isSevere = activePatient.clinicalInfo.severity.toLowerCase().includes('severe') || activePatient.clinicalInfo.severity.toLowerCase().includes('high');
+
     const completedPatient: Patient = {
       ...activePatient,
       status: 'Complete',
-      priority: activePatient.clinicalInfo.severity.toLowerCase().includes('severe') ? 'High' : 'Normal',
+      priority: isSevere ? 'High' : 'Normal',
       intakeTimestamp: 'Today, Just now',
-      doctorReviewed: false
+      doctorReviewed: false,
+      fhirBundle: fhir
     };
 
     setPatientQueue(prev => {
@@ -223,7 +408,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
 
     setSelectedDoctorPatient(completedPatient);
-    showToast('Intake summary sent to Doctor Dashboard.');
+    showToast(`Intake completed! Token #${completedPatient.tokenNumber} generated and pushed to HIS.`);
   };
 
   const markPatientAsReviewed = (patientId: string) => {
@@ -304,12 +489,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setCurrentScreen,
         navigateBack,
         screenHistory,
+        clinicalDepartment,
+        setClinicalDepartment,
         activePatient,
         setActivePatient,
         updateActiveClinicalInfo,
+        updateAyushAssessment,
         addMessageToActivePatient,
         resetPatientFlow,
         loadExistingPatient,
+        documents: activePatient.documents || [],
+        addScannedDocument,
+        removeDocument,
+        isOcrScanning,
+        simulateOcrScan,
+        isAbhaVerified,
+        verifyAbhaProfile,
+        generateFhirBundle,
         currentLanguage,
         setCurrentLanguage,
         getLanguageDetails,
