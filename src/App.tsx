@@ -6,6 +6,7 @@ import { AccessibilityModal } from './components/common/AccessibilityModal';
 import { HelpModal } from './components/common/HelpModal';
 import { AboutModal } from './components/common/AboutModal';
 import { UrgentAlertModal } from './components/common/UrgentAlertModal';
+import { DoctorLoginModal } from './components/common/DoctorLoginModal';
 
 import { KioskHome } from './components/kiosk/KioskHome';
 import { PatientIdentification } from './components/kiosk/PatientIdentification';
@@ -70,6 +71,7 @@ const MainAppContent: React.FC = () => {
       <HelpModal />
       <AboutModal />
       <UrgentAlertModal />
+      <DoctorLoginModal />
     </div>
   );
 };

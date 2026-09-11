@@ -10,7 +10,9 @@ import {
   MedicalDocument,
   AbhaProfile,
   AyushAssessment,
-  FhirResourceBundle
+  FhirResourceBundle,
+  PatientRegistrationForm,
+  DoctorUser
 } from '../types';
 import { INITIAL_PATIENTS, SUPPORTED_LANGUAGES, SAMPLE_SCAN_TEMPLATES } from '../data/mockData';
 
@@ -29,7 +31,18 @@ interface AppContextType {
   updateAyushAssessment: (updates: Partial<AyushAssessment>) => void;
   addMessageToActivePatient: (msg: Omit<Message, 'id' | 'timestamp'>) => void;
   resetPatientFlow: () => void;
+  
+  // Real Patient Registration & Login
+  registerNewPatient: (formData: PatientRegistrationForm) => Patient;
+  loginPatientByMobileOrId: (query: string, otp?: string) => { success: boolean; patient?: Patient; error?: string };
   loadExistingPatient: (patientId: string) => boolean;
+
+  // Doctor Auth & Session
+  activeDoctor: DoctorUser;
+  loginDoctor: (regNumber: string, pin: string) => boolean;
+  logoutDoctor: () => void;
+  isDoctorLoginModalOpen: boolean;
+  setIsDoctorLoginModalOpen: (open: boolean) => void;
 
   // Medical Document Intelligence (Module B)
   documents: MedicalDocument[];
@@ -75,6 +88,16 @@ interface AppContextType {
   showToast: (msg: string) => void;
 }
 
+const DEFAULT_DOCTOR: DoctorUser = {
+  id: 'DOC-892',
+  name: 'Dr. Alok K. Sharma',
+  specialty: 'MD (Internal Medicine) • Senior Consultant',
+  regNumber: 'MCI-48201',
+  roomNumber: 'Room 204 (OPD Block A)',
+  department: 'allopathy',
+  isLoggedIn: true
+};
+
 const DEFAULT_PATIENT_INFO: Patient = {
   id: 'P-1024',
   tokenNumber: 'A-104',
@@ -84,13 +107,16 @@ const DEFAULT_PATIENT_INFO: Patient = {
   department: 'allopathy',
   language: 'hi',
   languageName: 'Hindi (हिन्दी)',
-  chiefComplaint: 'Fever and headache',
+  chiefComplaint: 'Fever and headache for 3 days',
   status: 'In Progress',
   priority: 'Normal',
   time: 'Just now',
   lastVisit: '14 May 2026',
   intakeTimestamp: 'Just now',
   doctorReviewed: false,
+  mobile: '+91 98765 43210',
+  bloodGroup: 'B+',
+  address: 'House 42, Sector 14, Rohini, New Delhi 110085',
   abhaProfile: {
     abhaId: 'rajesh.kumar54@abdm',
     abhaNumber: '91-4829-1039-4821',
@@ -105,9 +131,9 @@ const DEFAULT_PATIENT_INFO: Patient = {
   clinicalInfo: {
     chiefComplaint: 'Fever and headache for 3 days',
     duration: '3 days',
-    severity: 'Moderate',
+    severity: 'Moderate (Temp 101.4°F)',
     temperature: '101.4°F',
-    associatedSymptoms: ['Headache (frontal)', 'Body malaise'],
+    associatedSymptoms: ['Throbbing frontal headache', 'Body malaise'],
     deniedSymptoms: ['Cough', 'Chest pain', 'Breathing difficulty', 'Vomiting'],
     medicationsTaken: ['Paracetamol 650mg'],
     allergies: 'No known drug allergies reported',
@@ -133,6 +159,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [selectedDoctorPatient, setSelectedDoctorPatient] = useState<Patient | null>(INITIAL_PATIENTS[0]);
   const [isOcrScanning, setIsOcrScanning] = useState(false);
   const [isAbhaVerified, setIsAbhaVerified] = useState(true);
+
+  // Doctor Auth State
+  const [activeDoctor, setActiveDoctor] = useState<DoctorUser>(DEFAULT_DOCTOR);
+  const [isDoctorLoginModalOpen, setIsDoctorLoginModalOpen] = useState(false);
 
   const [accessibility, setAccessibility] = useState<AccessibilitySettings>({
     largeText: false,
@@ -276,7 +306,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const simulateOcrScan = async (templateId?: string) => {
     setIsOcrScanning(true);
-    await new Promise(r => setTimeout(r, 1600));
+    await new Promise(r => setTimeout(r, 1500));
     
     const chosenTemplate = SAMPLE_SCAN_TEMPLATES.find(t => t.id === templateId) || SAMPLE_SCAN_TEMPLATES[0];
     const newDoc: MedicalDocument = {
@@ -287,6 +317,115 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     addScannedDocument(newDoc);
     setIsOcrScanning(false);
+  };
+
+  // Real Patient Registration
+  const registerNewPatient = (formData: PatientRegistrationForm): Patient => {
+    const newId = `P-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newToken = formData.department === 'ayush' ? `AY-${Math.floor(200 + Math.random() * 100)}` : `A-${Math.floor(100 + Math.random() * 100)}`;
+    
+    const generatedAbha: AbhaProfile = {
+      abhaId: formData.createAbha && formData.preferredAbhaAddress ? `${formData.preferredAbhaAddress.toLowerCase().replace(/[^a-z0-9]/g, '')}@abdm` : `${formData.name.toLowerCase().replace(/\s+/g, '')}${formData.age}@abdm`,
+      abhaNumber: `91-${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}`,
+      name: formData.name,
+      gender: formData.gender,
+      dob: formData.dob || '1980-01-01',
+      mobile: formData.mobile,
+      address: `${formData.address}, ${formData.district}, ${formData.state}`,
+      state: formData.state,
+      district: formData.district,
+      bloodGroup: formData.bloodGroup,
+      isLinked: true,
+      kycVerified: true
+    };
+
+    const newPatient: Patient = {
+      id: newId,
+      tokenNumber: newToken,
+      name: formData.name,
+      age: formData.age,
+      gender: formData.gender,
+      department: formData.department,
+      language: currentLanguage,
+      languageName: getLanguageDetails(currentLanguage).name,
+      chiefComplaint: 'Awaiting intake recording',
+      status: 'In Progress',
+      priority: 'Normal',
+      time: 'Just now',
+      lastVisit: 'First Registration (Today)',
+      intakeTimestamp: 'Just now',
+      doctorReviewed: false,
+      mobile: formData.mobile,
+      bloodGroup: formData.bloodGroup,
+      address: `${formData.address}, ${formData.district}, ${formData.state}`,
+      abhaProfile: generatedAbha,
+      clinicalInfo: {
+        chiefComplaint: '',
+        duration: '',
+        severity: 'Normal',
+        associatedSymptoms: [],
+        deniedSymptoms: [],
+        medicationsTaken: [],
+        allergies: 'No known drug allergies reported',
+        existingConditions: []
+      },
+      documents: [],
+      conversation: []
+    };
+
+    setActivePatient(newPatient);
+    setClinicalDepartmentState(formData.department);
+    showToast(`Patient registered! Token #${newToken} generated.`);
+    return newPatient;
+  };
+
+  // Real Patient Login by Mobile or ID
+  const loginPatientByMobileOrId = (query: string, otp?: string): { success: boolean; patient?: Patient; error?: string } => {
+    const cleanQuery = query.trim().toLowerCase();
+    if (!cleanQuery) return { success: false, error: 'Please enter a valid Patient ID, Mobile number, or ABHA address.' };
+
+    const found = patientQueue.find(p => 
+      p.id.toLowerCase() === cleanQuery || 
+      p.tokenNumber.toLowerCase() === cleanQuery ||
+      p.mobile?.replace(/\s+/g, '').includes(cleanQuery.replace(/\s+/g, '')) ||
+      p.abhaProfile?.abhaId.toLowerCase() === cleanQuery ||
+      p.abhaProfile?.abhaNumber.replace(/[^0-9]/g, '') === cleanQuery.replace(/[^0-9]/g, '')
+    );
+
+    if (found) {
+      setActivePatient({
+        ...found,
+        status: 'In Progress',
+        time: 'Just now'
+      });
+      setCurrentLanguageState(found.language);
+      setClinicalDepartmentState(found.department || 'allopathy');
+      showToast(`Welcome back, ${found.name}! Session authenticated.`);
+      return { success: true, patient: found };
+    }
+
+    return { success: false, error: 'No patient record found matching those credentials. Please register as a new patient.' };
+  };
+
+  // Doctor Auth
+  const loginDoctor = (regNumber: string, pin: string): boolean => {
+    if (regNumber.trim() && (pin === '1234' || pin === 'admin' || pin.length >= 4)) {
+      setActiveDoctor(prev => ({
+        ...prev,
+        regNumber: regNumber.toUpperCase(),
+        isLoggedIn: true
+      }));
+      setIsDoctorLoginModalOpen(false);
+      showToast(`Authenticated as ${activeDoctor.name} (${regNumber.toUpperCase()})`);
+      return true;
+    }
+    return false;
+  };
+
+  const logoutDoctor = () => {
+    setActiveDoctor(prev => ({ ...prev, isLoggedIn: false }));
+    setCurrentScreen('kiosk-home');
+    showToast('Doctor session logged out.');
   };
 
   const verifyAbhaProfile = (profile: AbhaProfile) => {
@@ -330,7 +469,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           resource: {
             resourceType: 'Condition',
             clinicalStatus: { coding: [{ code: 'active' }] },
-            code: { text: activePatient.clinicalInfo.chiefComplaint }
+            code: { text: activePatient.clinicalInfo.chiefComplaint || 'Consultation Intake' }
           }
         },
         ...activePatient.documents.map(doc => ({
@@ -356,18 +495,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const loadExistingPatient = (patientId: string): boolean => {
-    const found = patientQueue.find(p => p.id.toUpperCase() === patientId.trim().toUpperCase() || p.tokenNumber.toUpperCase() === patientId.trim().toUpperCase());
-    if (found) {
-      setActivePatient({
-        ...found,
-        status: 'In Progress',
-        time: 'Just now'
-      });
-      setCurrentLanguageState(found.language);
-      setClinicalDepartmentState(found.department || 'allopathy');
-      return true;
-    }
-    return false;
+    const res = loginPatientByMobileOrId(patientId);
+    return res.success;
   };
 
   const resetPatientFlow = () => {
@@ -408,7 +537,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
 
     setSelectedDoctorPatient(completedPatient);
-    showToast(`Intake completed! Token #${completedPatient.tokenNumber} generated and pushed to HIS.`);
+    showToast(`Intake completed! Token #${completedPatient.tokenNumber} pushed to Doctor EMR.`);
   };
 
   const markPatientAsReviewed = (patientId: string) => {
@@ -497,7 +626,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateAyushAssessment,
         addMessageToActivePatient,
         resetPatientFlow,
+        registerNewPatient,
+        loginPatientByMobileOrId,
         loadExistingPatient,
+        activeDoctor,
+        loginDoctor,
+        logoutDoctor,
+        isDoctorLoginModalOpen,
+        setIsDoctorLoginModalOpen,
         documents: activePatient.documents || [],
         addScannedDocument,
         removeDocument,

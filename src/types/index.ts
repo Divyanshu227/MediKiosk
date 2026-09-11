@@ -125,6 +125,9 @@ export interface AbhaProfile {
   dob: string;
   mobile: string;
   address: string;
+  state?: string;
+  district?: string;
+  bloodGroup?: string;
   isLinked: boolean;
   kycVerified: boolean;
 }
@@ -136,6 +139,34 @@ export interface FhirResourceBundle {
   timestamp: string;
   totalEntries: number;
   fhirJson: string;
+}
+
+export interface PatientRegistrationForm {
+  name: string;
+  age: number;
+  dob: string;
+  gender: 'Male' | 'Female' | 'Other';
+  mobile: string;
+  email: string;
+  address: string;
+  state: string;
+  district: string;
+  bloodGroup: string;
+  emergencyContact: string;
+  emergencyRelation: string;
+  department: ClinicalDepartment;
+  createAbha: boolean;
+  preferredAbhaAddress: string;
+}
+
+export interface DoctorUser {
+  id: string;
+  name: string;
+  specialty: string;
+  regNumber: string;
+  roomNumber: string;
+  department: ClinicalDepartment;
+  isLoggedIn: boolean;
 }
 
 export interface Patient {
@@ -160,6 +191,9 @@ export interface Patient {
   conversation: Message[];
   doctorReviewed?: boolean;
   intakeTimestamp: string;
+  mobile?: string;
+  bloodGroup?: string;
+  address?: string;
 }
 
 export interface AccessibilitySettings {
