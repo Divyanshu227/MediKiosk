@@ -67,7 +67,7 @@ export const Header: React.FC = () => {
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 font-normal hidden sm:block">
-                Multilingual AI Clinical Intake & EHR System
+                Pre-Consultation Intake Terminal • 10 Indian Languages
               </p>
             </div>
           </div>

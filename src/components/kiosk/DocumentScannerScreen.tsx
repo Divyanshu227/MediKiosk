@@ -177,7 +177,7 @@ export const DocumentScannerScreen: React.FC = () => {
             </span>
           </div>
           <h1 className="text-xl font-bold text-slate-900">
-            Medical Document Scanner & Prior Record Intelligence
+            Medical Document Scanner
           </h1>
           <p className="text-xs text-slate-600">
             Digitize your physical paper prescriptions, blood reports, or discharge slips for the physician.
@@ -216,7 +216,7 @@ export const DocumentScannerScreen: React.FC = () => {
                 <span>Kiosk Optical Scanner</span>
               </h2>
               <span className="text-[10px] text-teal-800 font-bold bg-teal-50 border border-teal-200 px-2 py-0.5 rounded">
-                High-Res OCR Active
+                OCR Ready
               </span>
             </div>
 
@@ -279,7 +279,7 @@ export const DocumentScannerScreen: React.FC = () => {
             {isOcrScanning && (
               <div className="w-full py-2.5 px-3 rounded-lg bg-teal-50 border border-teal-200 flex items-center justify-center space-x-2 text-teal-800 text-xs font-bold animate-pulse">
                 <RefreshCw className="w-4 h-4 animate-spin" />
-                <span>Running Indic-OCR & Entity Extraction Pipeline...</span>
+                <span>Reading document and extracting text...</span>
               </div>
             )}
 
@@ -544,10 +544,10 @@ export const DocumentScannerScreen: React.FC = () => {
                 {selectedDocForPreview && (
                   <div className="mt-4 p-4 rounded-xl bg-slate-900 text-slate-100 space-y-2 border border-slate-800">
                     <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-800">
-                      <span className="font-bold text-teal-400 flex items-center space-x-1.5">
-                        <Sparkles className="w-3.5 h-3.5" />
-                        <span>OCR Extracted Text & NLP Analysis ({selectedDocForPreview.title})</span>
-                      </span>
+                        <span className="font-bold text-teal-400 flex items-center space-x-1.5">
+                          <Sparkles className="w-3.5 h-3.5" />
+                          <span>OCR Extracted Text ({selectedDocForPreview.title})</span>
+                        </span>
                       <span className="text-[10px] text-slate-400 font-mono">
                         Confidence: {(selectedDocForPreview.ocrConfidence * 100).toFixed(0)}%
                       </span>

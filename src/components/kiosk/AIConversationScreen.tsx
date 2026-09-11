@@ -276,7 +276,7 @@ export const AIConversationScreen: React.FC = () => {
                 </div>
                 <div className="bg-teal-50 border border-teal-200 text-teal-800 rounded-lg rounded-tl-none p-2.5 text-xs font-semibold flex items-center space-x-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-teal-600 animate-spin"></span>
-                  <span>Transcribing speech and extracting clinical entities...</span>
+                  <span>Transcribing your speech...</span>
                 </div>
               </div>
             )}
@@ -372,7 +372,7 @@ export const AIConversationScreen: React.FC = () => {
               </h3>
             </div>
             <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-teal-50 text-teal-800 border border-teal-200">
-              Live AI Structuring
+              Updating live
             </span>
           </div>
 

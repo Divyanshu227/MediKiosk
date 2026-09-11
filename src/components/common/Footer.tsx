@@ -13,7 +13,7 @@ export const Footer: React.FC = () => {
           <div className="flex items-center space-x-2 text-center md:text-left">
             <ShieldCheck className="w-4 h-4 text-teal-600 shrink-0" />
             <p className="text-slate-600">
-              <strong className="text-slate-800 font-semibold">Clinical Decision Support:</strong> MediKiosk structures patient intake data. Attending healthcare professionals make all final diagnostic and treatment decisions.
+              <strong className="text-slate-800 font-semibold">Note:</strong> MediKiosk records and structures patient history. The attending doctor reviews all information and makes every diagnostic and treatment decision.
             </p>
           </div>
 

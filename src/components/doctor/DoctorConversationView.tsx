@@ -51,7 +51,7 @@ export const DoctorConversationView: React.FC = () => {
 
         <div className="flex items-center space-x-1.5 text-xs text-slate-600 bg-slate-50 px-2.5 py-1 rounded border border-slate-200">
           <Clock className="w-3.5 h-3.5 text-teal-700" />
-          <span>Intake Duration: ~2 mins</span>
+          <span>Intake: {conversation.length} question–answer turns</span>
         </div>
       </div>
 

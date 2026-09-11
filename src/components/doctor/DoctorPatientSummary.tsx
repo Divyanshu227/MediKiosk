@@ -339,12 +339,12 @@ export const DoctorPatientSummary: React.FC = () => {
             <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
               <div className="flex items-center space-x-1.5 text-slate-900 font-bold text-xs uppercase tracking-wider">
                 <Sparkles className="w-3.5 h-3.5 text-teal-700" />
-                <span>AI Clinical Differential Diagnostic Prompts (For Physician Evaluation)</span>
+                <span>Differential Prompts for Physician Review</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <div className="p-2 bg-white rounded-lg border border-slate-200">
                   <span className="font-bold text-slate-900 text-xs block">1. Acute Viral Pharyngitis / URI</span>
-                  <span className="text-[10px] text-slate-500">ICD-10: J06.9 (High likelihood based on acute onset fever & headache)</span>
+                  <span className="text-[10px] text-slate-500">ICD-10: J06.9 — consider if consistent with acute onset fever & headache</span>
                 </div>
                 <div className="p-2 bg-white rounded-lg border border-slate-200">
                   <span className="font-bold text-slate-900 text-xs block">2. Seasonal Acute Febrile Illness</span>
@@ -487,7 +487,7 @@ export const DoctorPatientSummary: React.FC = () => {
                   <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-800">
                     <span className="font-bold text-teal-400 flex items-center space-x-1.5">
                       <Sparkles className="w-3.5 h-3.5" />
-                      <span>OCR Text & NLP Extractions ({selectedDoc ? selectedDoc.title : docs[0]?.title})</span>
+                      <span>OCR Extracted Text ({selectedDoc ? selectedDoc.title : docs[0]?.title})</span>
                     </span>
                     <span className="text-[10px] text-slate-400 font-mono">
                       OCR Confidence: {((selectedDoc || docs[0])?.ocrConfidence * 100).toFixed(0)}%

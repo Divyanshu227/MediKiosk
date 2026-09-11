@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+ import React, { useState } from 'react';
 import { 
   ShieldCheck, 
   Mic, 
@@ -96,9 +96,9 @@ export const ConsentScreen: React.FC = () => {
             <div className="w-7 h-7 rounded-md bg-indigo-100 text-indigo-800 flex items-center justify-center">
               <Mic className="w-3.5 h-3.5" />
             </div>
-            <h3 className="text-xs font-bold text-slate-900">Bilingual Speech AI</h3>
+            <h3 className="text-xs font-bold text-slate-900">Voice & Speech Transcription</h3>
             <p className="text-[11px] text-slate-600 leading-relaxed">
-              Spoken conversation in {lang.nativeName} is transcribed into structured clinical notes for the doctor.
+              Your spoken answers in {lang.nativeName} are transcribed into clinical notes for the doctor to review.
             </p>
           </div>
 
@@ -117,7 +117,7 @@ export const ConsentScreen: React.FC = () => {
         {/* Granular Checkboxes */}
         <div className="space-y-2.5 pt-1">
           <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-            Granular Patient Authorizations:
+            What you are authorizing:
           </p>
 
           {/* 1. Voice Capture */}
@@ -135,7 +135,7 @@ export const ConsentScreen: React.FC = () => {
                 1. Voice & Speech Recognition Consent (आवाज रिकॉर्डिंग एवं रूपांतरण)
               </label>
               <p className="text-[11px] text-slate-600">
-                Authorize AI voice engine to capture spoken answers in {lang.name} for clinical history intake.
+                Allow the kiosk to record and transcribe what you say in {lang.name} for clinical history intake.
               </p>
             </div>
           </div>
