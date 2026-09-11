@@ -7,7 +7,6 @@ import { HelpModal } from './components/common/HelpModal';
 import { AboutModal } from './components/common/AboutModal';
 import { UrgentAlertModal } from './components/common/UrgentAlertModal';
 
-// Kiosk Patient Screens
 import { KioskHome } from './components/kiosk/KioskHome';
 import { PatientIdentification } from './components/kiosk/PatientIdentification';
 import { LanguageSelection } from './components/kiosk/LanguageSelection';
@@ -17,7 +16,6 @@ import { AIConversationScreen } from './components/kiosk/AIConversationScreen';
 import { ReviewScreen } from './components/kiosk/ReviewScreen';
 import { ClinicalSummaryScreen } from './components/kiosk/ClinicalSummaryScreen';
 
-// Doctor Screens
 import { DoctorSidebar } from './components/doctor/DoctorSidebar';
 import { DoctorDashboard } from './components/doctor/DoctorDashboard';
 import { DoctorPatientSummary } from './components/doctor/DoctorPatientSummary';
@@ -31,25 +29,19 @@ const MainAppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 selection:bg-teal-100 selection:text-teal-900">
-      
-      {/* Toast Notification Banner */}
       {toastMessage && (
-        <div className="fixed top-24 right-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl border border-teal-500/40 text-xs sm:text-sm font-bold flex items-center space-x-2.5 animate-bounce">
-          <span className="w-2.5 h-2.5 rounded-full bg-teal-400"></span>
+        <div className="fixed top-20 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg border border-slate-700 text-xs sm:text-sm font-semibold flex items-center space-x-2.5 transition-all">
+          <span className="w-2 h-2 rounded-full bg-teal-400"></span>
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Global Header */}
       <Header />
 
-      {/* Main Container */}
       <main className="flex-1 flex flex-col">
         {isDoctorMode ? (
-          /* Doctor Layout with Sidebar */
           <div className="flex-1 flex flex-col lg:flex-row">
             <DoctorSidebar activeTab={doctorActiveTab} setActiveTab={setDoctorActiveTab} />
-            
             <div className="flex-1 flex flex-col bg-slate-50/50">
               {currentScreen === 'doctor-dashboard' && <DoctorDashboard />}
               {currentScreen === 'doctor-patient-summary' && <DoctorPatientSummary />}
@@ -57,7 +49,6 @@ const MainAppContent: React.FC = () => {
             </div>
           </div>
         ) : (
-          /* Patient Kiosk Fullscreen Centered Layout */
           <div className="flex-1 flex flex-col justify-center">
             {currentScreen === 'kiosk-home' && <KioskHome />}
             {currentScreen === 'patient-id' && <PatientIdentification />}
@@ -71,15 +62,12 @@ const MainAppContent: React.FC = () => {
         )}
       </main>
 
-      {/* Global Footer */}
       <Footer />
 
-      {/* Modals */}
       <AccessibilityModal />
       <HelpModal />
       <AboutModal />
       <UrgentAlertModal />
-
     </div>
   );
 };

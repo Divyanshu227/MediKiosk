@@ -10,13 +10,11 @@ import {
 import { INITIAL_PATIENTS, SUPPORTED_LANGUAGES } from '../data/mockData';
 
 interface AppContextType {
-  // Navigation
   currentScreen: ScreenType;
   setCurrentScreen: (screen: ScreenType) => void;
   navigateBack: () => void;
   screenHistory: ScreenType[];
 
-  // Patient Intake State
   activePatient: Patient;
   setActivePatient: React.Dispatch<React.SetStateAction<Patient>>;
   updateActiveClinicalInfo: (updates: Partial<ClinicalInfo>) => void;
@@ -24,12 +22,10 @@ interface AppContextType {
   resetPatientFlow: () => void;
   loadExistingPatient: (patientId: string) => boolean;
 
-  // Language
   currentLanguage: LanguageCode;
   setCurrentLanguage: (lang: LanguageCode) => void;
   getLanguageDetails: (langCode?: LanguageCode) => typeof SUPPORTED_LANGUAGES[0];
 
-  // Doctor Dashboard State
   patientQueue: Patient[];
   selectedDoctorPatient: Patient | null;
   setSelectedDoctorPatient: (patient: Patient | null) => void;
@@ -37,14 +33,12 @@ interface AppContextType {
   markPatientAsReviewed: (patientId: string) => void;
   updatePatientPriority: (patientId: string, priority: 'Normal' | 'High' | 'Urgent') => void;
 
-  // Accessibility
   accessibility: AccessibilitySettings;
   updateAccessibility: (updates: Partial<AccessibilitySettings>) => void;
   speakText: (text: string, langCode?: LanguageCode) => void;
   isSpeaking: boolean;
   stopSpeaking: () => void;
 
-  // Modals & Safety
   isAccessibilityModalOpen: boolean;
   setIsAccessibilityModalOpen: (open: boolean) => void;
   isHelpModalOpen: boolean;
@@ -56,7 +50,6 @@ interface AppContextType {
   urgentReason: string;
   triggerUrgentAlert: (reason: string) => void;
   
-  // Toast notifications
   toastMessage: string | null;
   showToast: (msg: string) => void;
 }
@@ -85,7 +78,7 @@ const DEFAULT_PATIENT_INFO: Patient = {
     medicationsTaken: ['Paracetamol 650mg'],
     allergies: 'Not reported / None known',
     existingConditions: ['Hypertension'],
-    notes: 'Intake conducted in Hindi via speech interface.'
+    notes: 'Intake recorded in Hindi via speech interface.'
   },
   conversation: []
 };
@@ -100,7 +93,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activePatient, setActivePatient] = useState<Patient>(DEFAULT_PATIENT_INFO);
   const [selectedDoctorPatient, setSelectedDoctorPatient] = useState<Patient | null>(INITIAL_PATIENTS[0]);
 
-  // Accessibility
   const [accessibility, setAccessibility] = useState<AccessibilitySettings>({
     largeText: false,
     highContrast: false,
@@ -109,7 +101,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
   const [isSpeaking, setIsSpeaking] = useState(false);
 
-  // Modals
   const [isAccessibilityModalOpen, setIsAccessibilityModalOpen] = useState(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
@@ -117,26 +108,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [urgentReason, setUrgentReason] = useState('Severe chest pain or respiratory distress detected.');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Apply accessibility classes to body
   useEffect(() => {
     const body = document.body;
-    if (accessibility.highContrast) {
-      body.classList.add('high-contrast');
-    } else {
-      body.classList.remove('high-contrast');
-    }
-
-    if (accessibility.largeText) {
-      body.classList.add('large-text');
-    } else {
-      body.classList.remove('large-text');
-    }
-
-    if (accessibility.reduceMotion) {
-      body.classList.add('reduce-motion');
-    } else {
-      body.classList.remove('reduce-motion');
-    }
+    body.classList.toggle('high-contrast', accessibility.highContrast);
+    body.classList.toggle('large-text', accessibility.largeText);
+    body.classList.toggle('reduce-motion', accessibility.reduceMotion);
   }, [accessibility]);
 
   const setCurrentScreen = (screen: ScreenType) => {
@@ -148,7 +124,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const navigateBack = () => {
     if (screenHistory.length > 1) {
       const newHistory = [...screenHistory];
-      newHistory.pop(); // remove current
+      newHistory.pop();
       const prevScreen = newHistory[newHistory.length - 1];
       setScreenHistory(newHistory);
       setCurrentScreenState(prevScreen);
@@ -247,7 +223,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
 
     setSelectedDoctorPatient(completedPatient);
-    showToast('Intake data sent successfully to Doctor Dashboard!');
+    showToast('Intake summary sent to Doctor Dashboard.');
   };
 
   const markPatientAsReviewed = (patientId: string) => {
@@ -260,7 +236,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (selectedDoctorPatient?.id === patientId) {
       setSelectedDoctorPatient(prev => prev ? { ...prev, doctorReviewed: true, status: 'Complete' } : null);
     }
-    showToast(`Patient ${patientId} marked as Reviewed.`);
+    showToast(`Patient ${patientId} marked as reviewed.`);
   };
 
   const updatePatientPriority = (patientId: string, priority: 'Normal' | 'High' | 'Urgent') => {

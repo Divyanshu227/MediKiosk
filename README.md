@@ -1,44 +1,41 @@
-# 🏥 MEDIKIOSK — AI-Powered Multilingual Primary Care Assistant
+# MediKiosk
 
-Medikiosk is an intelligent, voice-first healthcare kiosk designed to reduce consultation time and improve access to primary healthcare, especially for elderly, rural, and multilingual patients.
+MediKiosk is an interactive, voice-enabled patient intake application designed for hospital outpatient departments (OPD). It allows patients to record their symptoms and medical history in their native language before consultation, generating a structured clinical summary for attending physicians.
 
----
+## Features
 
-## ✨ Features
+- **Multilingual Voice Intake:** Supports 10 Indian regional languages (Hindi, English, Bengali, Telugu, Marathi, Tamil, Gujarati, Kannada, Malayalam, Punjabi).
+- **Structured Clinical Data:** Captures chief complaints, symptom duration, severity, temperature, positive/negative symptoms, medications taken, and known allergies.
+- **Doctor Portal & Live Queue:** Real-time patient queue with priority flags, clinical summary breakdowns, and verbatim audio/translation transcripts.
+- **Red-Flag Emergency Alerts:** Automatic safety alert trigger for acute conditions (such as severe chest pain or respiratory distress) to alert triage staff immediately.
+- **Accessibility Modes:** Large text mode, high-contrast dark mode, and speech synthesis voice guidance.
 
-- **🗣️ Voice-First Indic Speech AI:** Natural voice intake supporting 10 Indian languages (Hindi, English, Bengali, Telugu, Marathi, Tamil, Gujarati, Kannada, Malayalam, Punjabi).
-- **📋 Conversational Clinical Intake:** Dynamically captures Chief Complaint, HPI, duration, severity, temperature, positive & negative symptoms, medications, and allergies.
-- **⚡ Doctor-Ready Summary Slip:** Compiles unstructured voice dialogues into standardized medical summaries in < 2 minutes.
-- **🚨 Emergency Red-Flag Triage:** Immediate clinical safety intervention for acute life-threatening symptoms (e.g., severe chest pain).
-- **♿ Universal Accessibility:** Large touch targets, High Contrast Dark Mode, Larger Text Mode, and Voice Assistant audio guidance.
-- **🩺 Doctor Portal & Live Queue:** Real-time patient queue, analytics metrics, 7-section clinical briefing, and verbatim transcript timeline with audio replay.
-
----
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js (v18+)
-- npm or yarn
+- npm
 
-### Installation & Run
+### Installation & Development
 
 ```bash
-# Install dependencies
 npm install
-
-# Start local dev server
 npm run dev
 ```
 
-Open [http://localhost:5173/](http://localhost:5173/) in your browser.
+The app will be available locally at `http://localhost:5173/`.
 
----
+### Building for Production
 
-## 🛠️ Tech Stack
+```bash
+npm run build
+```
 
-- **React 19 + TypeScript**
-- **Tailwind CSS** (Clinical Medical Theme)
-- **Lucide Icons**
+## Tech Stack
+
+- **React 19**
+- **TypeScript**
+- **Tailwind CSS**
+- **Lucide React**
 - **Vite**
-- **Web Speech Synthesis API**
+- **Web Speech API**
