@@ -80,9 +80,19 @@ export const AIConversationScreen: React.FC = () => {
     if (currentStepIndex < flowSteps.length - 1) {
       setCurrentStepIndex(prev => prev + 1);
     } else {
-      const finalMsg = currentLanguage === 'hi'
-        ? 'धन्यवाद। आपका प्रारंभिक विवरण दर्ज हो गया है। अब कृपया अपने पिछले मेडिकल दस्तावेज या पर्चे स्कैन करें।'
-        : 'Thank you. Your clinical intake details are recorded. Now please scan your previous medical documents.';
+      const finalMessages: Record<string, string> = {
+        hi: 'धन्यवाद। आपका प्रारंभिक विवरण दर्ज हो गया है। अब कृपया अपने पिछले मेडिकल दस्तावेज या पर्चे स्कैन करें।',
+        en: 'Thank you. Your clinical intake details are recorded. Now please scan your previous medical documents.',
+        pa: 'ਧੰਨਵਾਦ। ਤੁਹਾਡਾ ਸ਼ੁਰੂਆਤੀ ਵੇਰਵਾ ਦਰਜ ਹੋ ਗਿਆ ਹੈ। ਹੁਣ ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੇ ਪਿਛਲੇ ਮੈਡੀਕਲ ਦਸਤਾਵੇਜ਼ ਜਾਂ ਪਰਚੀਆਂ ਸਕੈਨ ਕਰੋ।',
+        kn: 'ಧನ್ಯವಾದಗಳು. ನಿಮ್ಮ ಪ್ರಾಥಮಿಕ ವಿವರಗಳನ್ನು ದಾಖಲಿಸಲಾಗಿದೆ. ಈಗ ದಯವಿಟ್ಟು ನಿಮ್ಮ ಹಿಂದಿನ ವೈದ್ಯಕೀಯ ದಾಖಲೆಗಳನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ.',
+        ml: 'നന്ദി. നിങ്ങളുടെ പ്രാഥമിക വിവരങ്ങൾ രേഖപ്പെടുത്തിയിട്ടുണ്ട്. ഇനി നിങ്ങളുടെ പഴയ മെഡിക്കൽ രേഖകൾ സ്കാൻ ചെയ്യുക.',
+        bn: 'ধন্যবাদ। আপনার প্রাথমিক বিবরণ নথিভুক্ত হয়েছে। এখন দয়া করে আপনার পূর্ববর্তী মেডিকেল নথি স্ক্যান করুন।',
+        te: 'ధన్యవాదాలు. మీ ప్రాథమిక వివరాలు నమోదు చేయబడ్డాయి. ఇప్పుడు దయచేసి మీ మునుపటి వైద్య పత్రాలను స్కాన్ చేయండి.',
+        ta: 'நன்றி. உங்கள் ஆரம்ப விவரங்கள் பதிவு செய்யப்பட்டுள்ளன. இப்போது உங்கள் முந்தைய மருத்துவ ஆவணங்களை ஸ்கேன் செய்யவும்.',
+        mr: 'धन्यवाद. तुमचा प्राथमिक तपशील नोंदवला गेला आहे. आता कृपया तुमची जुनी वैद्यकीय कागदपत्रे स्कॅन करा.',
+        gu: 'આભાર. તમારી પ્રારંભિક વિગતો નોંધાઈ ગઈ છે. હવે કૃપા કરીને તમારા જૂના તબીબી દસ્તાવેજો સ્કેન કરો.'
+      };
+      const finalMsg = finalMessages[currentLanguage] || finalMessages.en;
       
       addMessageToActivePatient({
         sender: 'ai',

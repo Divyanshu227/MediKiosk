@@ -37,17 +37,44 @@ export const VoiceIntakeScreen: React.FC = () => {
 
   const lang = getLanguageDetails(currentLanguage);
 
-  const initialPrompt = clinicalDepartment === 'ayush'
-    ? (currentLanguage === 'hi' 
-        ? `नमस्ते ${activePatient.name.split(' ')[0]} जी! आयुष ओपीडी में आपका स्वागत है। कृपया बताएं कि आपके शरीर में क्या मुख्य कष्ट या वेदना है?`
-        : `Namaste ${activePatient.name.split(' ')[0]} ji! Welcome to AYUSH OPD. Please speak your chief health discomfort or symptoms.`)
-    : (currentLanguage === 'hi'
-        ? `नमस्ते ${activePatient.name.split(' ')[0]} जी! मेडीकियोस्क में आपका स्वागत है। कृपया बताएं कि आज आपको क्या तकलीफ महसूस हो रही है?`
-        : `Hello ${activePatient.name.split(' ')[0]} ji! Welcome to MediKiosk. Please describe what symptoms or health issue you are experiencing today.`);
+  const getInitialPrompt = () => {
+    const firstName = activePatient.name.split(' ')[0] || 'Patient';
+    if (clinicalDepartment === 'ayush') {
+      const prompts: Record<string, string> = {
+        hi: `नमस्ते ${firstName} जी! आयुष ओपीडी में आपका स्वागत है। कृपया बताएं कि आपके शरीर में क्या मुख्य कष्ट या वेदना है?`,
+        en: `Namaste ${firstName} ji! Welcome to AYUSH OPD. Please speak your chief health discomfort or symptoms.`,
+        pa: `ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ${firstName} ਜੀ! ਆਯੁਸ਼ ਓਪੀਡੀ ਵਿੱਚ ਤੁਹਾਡਾ ਸਵਾਗਤ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਦੱਸੋ ਕਿ ਤੁਹਾਡੇ ਸਰੀਰ ਵਿੱਚ ਕੀ ਮੁੱਖ ਤਕਲੀਫ਼ ਜਾਂ ਦਰਦ ਹੈ?`,
+        kn: `ನಮಸ್ಕಾರ ${firstName} ಅವರೇ! ಆಯುಷ್ ಒಪಿಡಿಗೆ ಸುಸ್ವಾಗತ. ದಯವಿಟ್ಟು ನಿಮ್ಮ ದೇಹದಲ್ಲಿ ಯಾವ ಮುಖ್ಯ ತೊಂದರೆ ಅಥವಾ ನೋವು ಇದೆ ಎಂದು ತಿಳಿಸಿ.`,
+        ml: `നമസ്കാരം ${firstName}! ആയുഷ് ഒപിഡിയിലേക്ക് സ്വാഗതം. നിങ്ങളുടെ പ്രധാന ആരോഗ്യ അസ്വസ്ഥതയോ രോഗലക്ഷണങ്ങളോ ദയവായി പറയൂ.`,
+        bn: `নমস্কার ${firstName} বাবু! আয়ুষ ওপিডিতে আপনাকে স্বাগতম। আপনার শরীরে প্রধান কী সমস্যা বা ব্যথা হচ্ছে বলুন।`,
+        te: `నమస్కారం ${firstName} గారు! ఆయుష్ ఓపీడీకి స్వాగతం. మీ శరీరంలో ఉన్న ముఖ్య సమస్య లేదా నొప్పి గురించి చెప్పండి.`,
+        ta: `வணக்கம் ${firstName} அவர்களே! ஆயுஷ் புறநோயாளிகள் பிரிவுக்கு நல்வரவு. உங்கள் உடலில் உள்ள முக்கிய பிரச்சனை அல்லது வலியைப் பற்றி கூறுங்கள்.`,
+        mr: `नमस्कार ${firstName} जी! आयुष ओपीडीमध्ये आपले स्वागत आहे. कृपया सांगा की आपल्या शरीरात काय मुख्य त्रास किंवा वेदना आहे?`,
+        gu: `નમસ્તે ${firstName} ભાઈ/બહેન! આયુષ ઓપીડીમાં આપનું સ્વાગત છે. કૃપા કરીને જણાવો કે તમારા શરીરમાં શું મુખ્ય તકલીફ છે?`
+      };
+      return prompts[currentLanguage] || prompts.en;
+    } else {
+      const prompts: Record<string, string> = {
+        hi: `नमस्ते ${firstName} जी! मेडीकियोस्क में आपका स्वागत है। कृपया बताएं कि आज आपको क्या तकलीफ महसूस हो रही है?`,
+        en: `Hello ${firstName} ji! Welcome to MediKiosk. Please describe what symptoms or health issue you are experiencing today.`,
+        pa: `ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ${firstName} ਜੀ! ਮੈਡੀਕਿਓਸਕ ਵਿੱਚ ਤੁਹਾਡਾ ਸਵਾਗਤ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਦੱਸੋ ਕਿ ਅੱਜ ਤੁਹਾਨੂੰ ਕੀ ਤਕਲੀਫ਼ ਹੈ?`,
+        kn: `ನಮಸ್ಕಾರ ${firstName} ಅವರೇ! ಮೆಡಿಕಿಯೋಸ್ಕ್‌ಗೆ ಸುಸ್ವಾಗತ. ದಯವಿಟ್ಟು ಇಂದು ನಿಮಗೆ ಯಾವ ಆರೋಗ್ಯ ಸಮಸ್ಯೆ ಅಥವಾ ತೊಂದರೆ ಇದೆ ಎಂದು ತಿಳಿಸಿ.`,
+        ml: `നമസ്കാരം ${firstName}! മെഡികിയോസ്കിലേക്ക് സ്വാഗതം. ഇന്ന് നിങ്ങൾക്ക് എന്തെങ്കിലും ആരോഗ്യ പ്രശ്നമോ ബുദ്ധിമുട്ടോ ഉണ്ടോ എന്ന് ദയവായി പറയൂ.`,
+        bn: `নমস্কার ${firstName} বাবু! মেডিকিয়স্কে স্বাগতম। আজ আপনার কী ধরনের শারীরিক সমস্যা হচ্ছে বলুন।`,
+        te: `నమస్కారం ${firstName} గారు! మెడికియోస్క్‌కు స్వాగతం. ఈరోజు మీకు ఉన్న ఆరోగ్య సమస్య లేదా బాధను వివరించండి.`,
+        ta: `வணக்கம் ${firstName} அவர்களே! மெடிகியோஸ்க்கிற்கு வருக. இன்று உங்களுக்கு என்ன உடல்நல பிரச்சனை உள்ளது என்று விளக்குங்கள்.`,
+        mr: `नमस्कार ${firstName} जी! मेडीकियोस्कमध्ये आपले स्वागत आहे. कृपया सांगा आज तुम्हाला काय त्रास होत आहे?`,
+        gu: `નમસ્તે ${firstName} ભાઈ/બહેન! મેડીકિયોસ્કમાં આપનું સ્વાગત છે. કૃપા કરીને જણાવો કે આજે તમને શું તકલીફ છે?`
+      };
+      return prompts[currentLanguage] || prompts.en;
+    }
+  };
+
+  const initialPrompt = getInitialPrompt();
 
   useEffect(() => {
     speakText(initialPrompt, currentLanguage);
-  }, []);
+  }, [currentLanguage]);
 
   const getLanguageBcp47 = (code: string) => {
     const map: Record<string, string> = {
@@ -116,13 +143,35 @@ export const VoiceIntakeScreen: React.FC = () => {
     setMicState('LISTENING');
     setTranscription('');
 
-    const defaultPreset = currentLanguage === 'hi'
-      ? (clinicalDepartment === 'ayush' 
-          ? 'मेरे दोनों घुटनों में पिछले चार महीने से दर्द और जकड़न है, और पेट में भारीपन रहता है।' 
-          : 'मुझे पिछले तीन दिन से बुखार है और सिर में काफी भारीपन और दर्द हो रहा है।')
-      : (clinicalDepartment === 'ayush'
-          ? 'Severe stiffness and pain in bilateral knee joints for 4 months with sluggish digestion.'
-          : 'I have had high fever and throbbing headache for the last 3 days.');
+    const ayushPresets: Record<string, string> = {
+      hi: 'मेरे दोनों घुटनों में पिछले चार महीने से दर्द और जकड़न है, और पेट में भारीपन रहता है।',
+      en: 'Severe stiffness and pain in bilateral knee joints for 4 months with sluggish digestion.',
+      pa: 'ਮੇਰੇ ਦੋਵਾਂ ਗੋਡਿਆਂ ਵਿੱਚ ਪਿਛਲੇ ਚਾਰ ਮਹੀਨਿਆਂ ਤੋਂ ਦਰਦ ਅਤੇ ਅਕੜਾਅ ਹੈ, ਅਤੇ ਪੇਟ ਵਿੱਚ ਭਾਰਾਪਣ ਰਹਿੰਦਾ ਹੈ।',
+      kn: 'ನನ್ನ ಎರಡೂ ಮೊಣಕಾಲುಗಳಲ್ಲಿ ಕಳೆದ ನಾಲ್ಕು ತಿಂಗಳುಗಳಿಂದ ತೀವ್ರ ನೋವು ಮತ್ತು ಜಡತ್ವವಿದೆ, ಜೊತೆಗೆ ಜೀರ್ಣಕ್ರಿಯೆ ಮಂದವಾಗಿದೆ.',
+      ml: 'കഴിഞ്ഞ നാല് മാസമായി എന്റെ രണ്ട് കാൽമുട്ടുകളിലും കഠിനമായ വേദനയും വഴക്കമില്ലായ്മയും ഉണ്ട്, ദഹനക്കുറവും ഉണ്ട്.',
+      bn: 'আমার দুই হাঁটুতেই গত চার মাস ধরে তীব্র ব্যথা ও আড়ষ্টতা রয়েছে, এবং পেটে ভারী ভাব থাকে।',
+      te: 'నా రెండు మోకాళ్లలో గత నాలుగు నెలలుగా తీవ్రమైన నొప్పి మరియు బిగుతుగా ఉంది, జీర్ణక్రియ కూడా సరిగా లేదు.',
+      ta: 'எனது இரண்டு முழங்கால்களிலும் கடந்த நான்கு மாதங்களாக கடுமையான வலியும் விறைப்பும் உள்ளது, செரிமானக் கோளாறும் உள்ளது.',
+      mr: 'माझ्या दोन्ही गुडघ्यांमध्ये गेल्या चार महिन्यांपासून तीव्र वेदना आणि कडकपणा आहे, आणि पचन नीट होत नाही.',
+      gu: 'મારા બંને ઘૂંટણમાં છેલ્લા ચાર મહિનાથી દુખાવો અને જકડન છે, અને પેટમાં ભારેપણું રહે છે.'
+    };
+
+    const allopathyPresets: Record<string, string> = {
+      hi: 'मुझे पिछले तीन दिन से बुखार है और सिर में काफी भारीपन और दर्द हो रहा है।',
+      en: 'I have had high fever and throbbing headache for the last 3 days.',
+      pa: 'ਮੈਨੂੰ ਪਿਛਲੇ ਤਿੰਨ ਦਿਨਾਂ ਤੋਂ ਤੇਜ਼ ਬੁਖਾਰ ਅਤੇ ਸਿਰ ਵਿੱਚ ਬਹੁਤ ਦਰਦ ਹੋ ਰਿਹਾ ਹੈ।',
+      kn: 'ನನಗೆ ಕಳೆದ ಮೂರು ದಿನಗಳಿಂದ ತೀವ್ರ ಜ್ವರ ಮತ್ತು ತಲೆನೋವು ಇದೆ.',
+      ml: 'എനിക്ക് കഴിഞ്ഞ മൂന്ന് ദിവസമായി കഠിനമായ പനിയും ശക്തമായ തലവേദനയും ഉണ്ട്.',
+      bn: 'আমার গত তিন দিন ধরে প্রচণ্ড জ্বর এবং তীব্র মাথাব্যথা হচ্ছে।',
+      te: 'నాకు గత మూడు రోజులుగా తీవ్రమైన జ్వరం మరియు తీవ్రమైన తలనొప్పిగా ఉంది.',
+      ta: 'எனக்கு கடந்த மூன்று நாட்களாக அதிக காய்ச்சலும் கடுமையான தலைவலியும் உள்ளது.',
+      mr: 'मला गेल्या तीन दिवसांपासून तीव्र ताप आणि डोकेदुखीचा त्रास होत आहे.',
+      gu: 'મને છેલ્લા ત્રણ દિવસથી તીવ્ર તાવ અને માથાનો અસહ્ય દુખાવો છે.'
+    };
+
+    const defaultPreset = clinicalDepartment === 'ayush'
+      ? (ayushPresets[currentLanguage] || ayushPresets.en)
+      : (allopathyPresets[currentLanguage] || allopathyPresets.en);
 
     setTimeout(() => {
       setMicState('PROCESSING');

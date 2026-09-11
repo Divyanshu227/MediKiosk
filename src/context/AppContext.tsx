@@ -576,18 +576,68 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       const code = langCode || currentLanguage;
-      if (code === 'hi') utterance.lang = 'hi-IN';
-      else if (code === 'en') utterance.lang = 'en-US';
-      else if (code === 'bn') utterance.lang = 'bn-IN';
-      else if (code === 'ta') utterance.lang = 'ta-IN';
-      else if (code === 'te') utterance.lang = 'te-IN';
-      else if (code === 'mr') utterance.lang = 'mr-IN';
-      else if (code === 'gu') utterance.lang = 'gu-IN';
-      else utterance.lang = 'en-IN';
+
+      const localeMap: Record<LanguageCode, string> = {
+        hi: 'hi-IN',
+        en: 'en-IN',
+        bn: 'bn-IN',
+        ta: 'ta-IN',
+        te: 'te-IN',
+        mr: 'mr-IN',
+        gu: 'gu-IN',
+        kn: 'kn-IN',
+        ml: 'ml-IN',
+        pa: 'pa-IN'
+      };
+
+      const langNameMap: Record<LanguageCode, string[]> = {
+        hi: ['hindi', 'hi-in', 'hi_in', 'हिन्दी', 'devanagari'],
+        en: ['english', 'en-in', 'en-gb', 'en-us', 'en_in'],
+        bn: ['bengali', 'bangla', 'bn-in', 'bn_in', 'বাংলা'],
+        ta: ['tamil', 'ta-in', 'ta_in', 'தமிழ்'],
+        te: ['telugu', 'te-in', 'te_in', 'తెలుగు'],
+        mr: ['marathi', 'mr-in', 'mr_in', 'मराठी'],
+        gu: ['gujarati', 'gu-in', 'gu_in', 'ગુજરાતી'],
+        kn: ['kannada', 'kn-in', 'kn_in', 'ಕನ್ನಡ', 'gagan', 'sapna'],
+        ml: ['malayalam', 'ml-in', 'ml_in', 'മലയാളം', 'sobhana', 'midhun'],
+        pa: ['punjabi', 'pa-in', 'pa_in', 'panjabi', 'ਪੰਜਾਬੀ', 'gurpal', 'raavee']
+      };
+
+      const targetLocale = localeMap[code] || 'hi-IN';
+      utterance.lang = targetLocale;
+
+      // Select matching voice from browser if available
+      try {
+        const voices = window.speechSynthesis.getVoices();
+        if (voices && voices.length > 0) {
+          const matchKeywords = langNameMap[code] || [code];
+          const matchingVoice = voices.find(v => {
+            const vLang = v.lang.toLowerCase().replace('_', '-');
+            const vName = v.name.toLowerCase();
+            return (
+              vLang === targetLocale.toLowerCase() ||
+              vLang.startsWith(`${code}-`) ||
+              vLang === code ||
+              matchKeywords.some(k => vName.includes(k.toLowerCase()) || vLang.includes(k.toLowerCase()))
+            );
+          });
+          if (matchingVoice) {
+            utterance.voice = matchingVoice;
+          }
+        }
+      } catch {
+        // Continue with default voice
+      }
+
+      utterance.rate = 0.95;
+      utterance.pitch = 1.0;
 
       utterance.onstart = () => setIsSpeaking(true);
       utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+      };
+
       window.speechSynthesis.speak(utterance);
     }
   };
