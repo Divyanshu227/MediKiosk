@@ -16,6 +16,7 @@ import {
 } from '../types';
 import { INITIAL_PATIENTS, SUPPORTED_LANGUAGES, SAMPLE_SCAN_TEMPLATES } from '../data/mockData';
 import { playOnlineTtsAudio, transliterateGurmukhiToDevanagari, stopAllAudio } from '../utils/audioTts';
+import { resolveScreenFromPath, getHashForScreen, getRouteDetails } from '../routes';
 
 interface AppContextType {
   currentScreen: ScreenType;
@@ -85,8 +86,15 @@ interface AppContextType {
   urgentReason: string;
   triggerUrgentAlert: (reason: string) => void;
   
+  inputModality: 'voice' | 'touch';
+  setInputModality: (modality: 'voice' | 'touch') => void;
+  isArchitectureModalOpen: boolean;
+  setIsArchitectureModalOpen: (open: boolean) => void;
+  triggerRedFlagScreen: (reason: string) => void;
+
   toastMessage: string | null;
   showToast: (msg: string) => void;
+  resetAllSessionData: () => void;
 }
 
 const DEFAULT_DOCTOR: DoctorUser = {
@@ -145,34 +153,117 @@ const DEFAULT_PATIENT_INFO: Patient = {
     SAMPLE_SCAN_TEMPLATES[0],
     SAMPLE_SCAN_TEMPLATES[1]
   ],
+  timelineEvents: [
+    {
+      id: 'tl-1024-1',
+      date: '14 May 2026',
+      type: 'prescription',
+      title: 'AIIMS New Delhi — OPD Prescription',
+      facility: 'AIIMS New Delhi (Dept of Medicine)',
+      summary: 'Diagnosed Essential Hypertension. Prescribed Tab Amlodipine 5mg OD, Pantoprazole 40mg.',
+      tags: ['Amlodipine 5mg', 'Hypertension']
+    },
+    {
+      id: 'tl-1024-2',
+      date: '12 Aug 2026',
+      type: 'lab_report',
+      title: 'Dr. Lal PathLabs — Comprehensive Metabolic Panel',
+      facility: 'Dr. Lal PathLabs, Delhi Central',
+      summary: 'Critical blood report: HbA1c 9.4% (Severely Elevated), Fasting Blood Sugar 214 mg/dL, Creatinine 1.42 mg/dL.',
+      tags: ['HbA1c 9.4%', 'FBS 214 mg/dL', 'Creatinine 1.42'],
+      isAbnormal: true
+    },
+    {
+      id: 'tl-1024-3',
+      date: 'Today (Intake)',
+      type: 'intake',
+      title: 'MediKiosk Pre-Consultation Voice Intake',
+      facility: 'Hospital OPD Terminal #3',
+      summary: 'Acute fever (101.4°F) & frontal headache for 3 days. Denies cough/chest pain. Paracetamol SOS taken.',
+      tags: ['Fever 101.4°F', 'Headache 3d', 'Negative Chest Pain']
+    }
+  ],
+  missingInformation: [
+    'In-clinic blood pressure & pulse measurement',
+    'Recent post-prandial blood sugar verification',
+    'Examination for neck rigidity (Kernig/Brudzinski sign to rule out meningitis)'
+  ],
   conversation: []
+};
+
+const getInitialScreen = (): ScreenType => {
+  if (typeof window !== 'undefined') {
+    const hash = window.location.hash;
+    if (hash && hash.length > 1) {
+      return resolveScreenFromPath(hash);
+    }
+    try {
+      const saved = localStorage.getItem('medikiosk_current_screen') as ScreenType;
+      if (saved) {
+        return resolveScreenFromPath(saved);
+      }
+    } catch {}
+  }
+  return 'kiosk-home';
+};
+
+const getStored = <T,>(key: string, fallback: T): T => {
+  if (typeof window === 'undefined') return fallback;
+  try {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : fallback;
+  } catch {
+    return fallback;
+  }
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentScreen, setCurrentScreenState] = useState<ScreenType>('kiosk-home');
-  const [screenHistory, setScreenHistory] = useState<ScreenType[]>(['kiosk-home']);
-  const [clinicalDepartment, setClinicalDepartmentState] = useState<ClinicalDepartment>('allopathy');
-  const [currentLanguage, setCurrentLanguageState] = useState<LanguageCode>('hi');
-  const [patientQueue, setPatientQueue] = useState<Patient[]>(INITIAL_PATIENTS);
-  const [activePatient, setActivePatient] = useState<Patient>(DEFAULT_PATIENT_INFO);
-  const [selectedDoctorPatient, setSelectedDoctorPatient] = useState<Patient | null>(INITIAL_PATIENTS[0]);
+  const [currentScreen, setCurrentScreenState] = useState<ScreenType>(getInitialScreen);
+  const [screenHistory, setScreenHistory] = useState<ScreenType[]>(() => {
+    const initial = getInitialScreen();
+    const stored = getStored<ScreenType[]>('medikiosk_screen_history', [initial]);
+    return stored.includes(initial) ? stored : [...stored, initial];
+  });
+  const [clinicalDepartment, setClinicalDepartmentState] = useState<ClinicalDepartment>(() => 
+    getStored<ClinicalDepartment>('medikiosk_department', 'allopathy')
+  );
+  const [currentLanguage, setCurrentLanguageState] = useState<LanguageCode>(() => 
+    getStored<LanguageCode>('medikiosk_language', 'hi')
+  );
+  const [patientQueue, setPatientQueue] = useState<Patient[]>(() => 
+    getStored<Patient[]>('medikiosk_queue', INITIAL_PATIENTS)
+  );
+  const [activePatient, setActivePatient] = useState<Patient>(() => 
+    getStored<Patient>('medikiosk_active_patient', DEFAULT_PATIENT_INFO)
+  );
+  const [selectedDoctorPatient, setSelectedDoctorPatient] = useState<Patient | null>(() => 
+    getStored<Patient | null>('medikiosk_doctor_patient', INITIAL_PATIENTS[0])
+  );
   const [isOcrScanning, setIsOcrScanning] = useState(false);
   const [isAbhaVerified, setIsAbhaVerified] = useState(true);
 
   // Doctor Auth State
-  const [activeDoctor, setActiveDoctor] = useState<DoctorUser>(DEFAULT_DOCTOR);
+  const [activeDoctor, setActiveDoctor] = useState<DoctorUser>(() => 
+    getStored<DoctorUser>('medikiosk_doctor', DEFAULT_DOCTOR)
+  );
   const [isDoctorLoginModalOpen, setIsDoctorLoginModalOpen] = useState(false);
 
-  const [accessibility, setAccessibility] = useState<AccessibilitySettings>({
-    largeText: false,
-    highContrast: false,
-    voiceGuidance: true,
-    reduceMotion: false
-  });
+  const [accessibility, setAccessibility] = useState<AccessibilitySettings>(() => 
+    getStored<AccessibilitySettings>('medikiosk_accessibility', {
+      largeText: false,
+      highContrast: false,
+      voiceGuidance: true,
+      reduceMotion: false
+    })
+  );
   const [isSpeaking, setIsSpeaking] = useState(false);
 
+  const [inputModality, setInputModality] = useState<'voice' | 'touch'>(() => 
+    getStored<'voice' | 'touch'>('medikiosk_modality', 'voice')
+  );
+  const [isArchitectureModalOpen, setIsArchitectureModalOpen] = useState(false);
   const [isAccessibilityModalOpen, setIsAccessibilityModalOpen] = useState(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
@@ -187,9 +278,79 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     body.classList.toggle('reduce-motion', accessibility.reduceMotion);
   }, [accessibility]);
 
+  // Auto-persist state to localStorage across page reloads
+  useEffect(() => {
+    try {
+      localStorage.setItem('medikiosk_current_screen', currentScreen);
+      localStorage.setItem('medikiosk_screen_history', JSON.stringify(screenHistory));
+      localStorage.setItem('medikiosk_department', clinicalDepartment);
+      localStorage.setItem('medikiosk_language', currentLanguage);
+      localStorage.setItem('medikiosk_queue', JSON.stringify(patientQueue));
+      localStorage.setItem('medikiosk_active_patient', JSON.stringify(activePatient));
+      if (selectedDoctorPatient) {
+        localStorage.setItem('medikiosk_doctor_patient', JSON.stringify(selectedDoctorPatient));
+      }
+      localStorage.setItem('medikiosk_doctor', JSON.stringify(activeDoctor));
+      localStorage.setItem('medikiosk_modality', inputModality);
+      localStorage.setItem('medikiosk_accessibility', JSON.stringify(accessibility));
+    } catch (e) {
+      console.warn('LocalStorage save error:', e);
+    }
+  }, [
+    currentScreen,
+    screenHistory,
+    clinicalDepartment,
+    currentLanguage,
+    patientQueue,
+    activePatient,
+    selectedDoctorPatient,
+    activeDoctor,
+    inputModality,
+    accessibility
+  ]);
+
+  // Sync browser URL hash, document title & listen to Back/Forward buttons
+  useEffect(() => {
+    const canonicalHash = getHashForScreen(currentScreen);
+    if (window.location.hash !== canonicalHash) {
+      window.history.replaceState(null, '', canonicalHash);
+    }
+    const route = getRouteDetails(currentScreen);
+    document.title = `MediKiosk — ${route.title}`;
+
+    const handleHashChange = () => {
+      const resolved = resolveScreenFromPath(window.location.hash);
+      if (resolved && resolved !== currentScreen) {
+        setCurrentScreenState(resolved);
+        const newRoute = getRouteDetails(resolved);
+        document.title = `MediKiosk — ${newRoute.title}`;
+        setScreenHistory(prev => {
+          if (prev.length > 1 && prev[prev.length - 2] === resolved) {
+            return prev.slice(0, -1);
+          }
+          return [...prev, resolved];
+        });
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('popstate', handleHashChange);
+    };
+  }, [currentScreen]);
+
   const setCurrentScreen = (screen: ScreenType) => {
-    setScreenHistory(prev => [...prev, screen]);
+    setScreenHistory(prev => {
+      if (prev[prev.length - 1] === screen) return prev;
+      return [...prev, screen];
+    });
     setCurrentScreenState(screen);
+    const hash = getHashForScreen(screen);
+    window.location.hash = hash;
+    const route = getRouteDetails(screen);
+    document.title = `MediKiosk — ${route.title}`;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -209,10 +370,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const prevScreen = newHistory[newHistory.length - 1];
       setScreenHistory(newHistory);
       setCurrentScreenState(prevScreen);
+      window.location.hash = getHashForScreen(prevScreen);
+      const route = getRouteDetails(prevScreen);
+      document.title = `MediKiosk — ${route.title}`;
     } else {
-      setCurrentScreenState('kiosk-home');
+      const isDoc = currentScreen.startsWith('doctor-');
+      const fallback: ScreenType = isDoc ? 'doctor-dashboard' : 'kiosk-home';
+      setScreenHistory([fallback]);
+      setCurrentScreenState(fallback);
+      window.location.hash = getHashForScreen(fallback);
+      const route = getRouteDetails(fallback);
+      document.title = `MediKiosk — ${route.title}`;
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const resetAllSessionData = () => {
+    try {
+      localStorage.clear();
+    } catch (e) {
+      console.warn('LocalStorage clear error:', e);
+    }
+    setPatientQueue(INITIAL_PATIENTS);
+    setActivePatient(DEFAULT_PATIENT_INFO);
+    setSelectedDoctorPatient(INITIAL_PATIENTS[0]);
+    setClinicalDepartmentState('allopathy');
+    setCurrentLanguageState('hi');
+    setInputModality('voice');
+    setScreenHistory(['kiosk-home']);
+    setCurrentScreenState('kiosk-home');
+    window.location.hash = '#/kiosk-home';
+    showToast('Session reset to initial defaults.');
   };
 
   const setCurrentLanguage = (lang: LanguageCode) => {
@@ -681,6 +869,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsUrgentAlertOpen(true);
   };
 
+  const triggerRedFlagScreen = (reason: string) => {
+    setUrgentReason(reason);
+    setActivePatient(prev => ({
+      ...prev,
+      priority: 'Urgent',
+      status: 'Urgent',
+      redFlagReason: reason
+    }));
+    setCurrentScreen('red-flag');
+  };
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => {
@@ -743,8 +942,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsUrgentAlertOpen,
         urgentReason,
         triggerUrgentAlert,
+        inputModality,
+        setInputModality,
+        isArchitectureModalOpen,
+        setIsArchitectureModalOpen,
+        triggerRedFlagScreen,
         toastMessage,
-        showToast
+        showToast,
+        resetAllSessionData
       }}
     >
       {children}
