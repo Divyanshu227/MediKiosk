@@ -95,6 +95,7 @@ Adv: Quadriceps isometric exercises, avoid cross-legged sitting.`,
 ];
 
 export const INITIAL_PATIENTS: Patient[] = [
+  // PATIENT A: Returning Patient, Multiple Scanned Records, Allopathy
   {
     id: 'P-1024',
     tokenNumber: 'A-104',
@@ -104,15 +105,18 @@ export const INITIAL_PATIENTS: Patient[] = [
     department: 'allopathy',
     language: 'hi',
     languageName: 'Hindi (हिन्दी)',
-    chiefComplaint: 'Fever, severe headache and high blood sugar',
+    chiefComplaint: 'Fever, severe frontal headache and uncontrolled diabetes',
     status: 'Complete',
     priority: 'High',
     time: '09:45 AM',
     lastVisit: '14 May 2026',
     intakeTimestamp: 'Today, 09:45 AM',
     doctorReviewed: false,
+    mobile: '+91 98765 43210',
+    bloodGroup: 'B+',
+    address: 'House 42, Sector 14, Rohini, New Delhi 110085',
     abhaProfile: {
-      abhaId: 'rajesh.kumar54@abdm',
+      abhaId: 'rajesh.kumar54@abdm (Demo)',
       abhaNumber: '91-4829-1039-4821',
       name: 'Rajesh Kumar',
       gender: 'Male',
@@ -124,34 +128,71 @@ export const INITIAL_PATIENTS: Patient[] = [
     },
     clinicalInfo: {
       chiefComplaint: 'Fever and throbbing headache for 3 days',
-      duration: '3 days',
+      duration: '3 days (intermittent, spiking evening/night)',
       severity: 'Moderate to High (Temp 101.4°F)',
       temperature: '101.4°F',
       associatedSymptoms: ['Throbbing frontal headache', 'Body malaise', 'Polyuria (increased urination)'],
       deniedSymptoms: ['Cough', 'Chest pain', 'Shortness of breath', 'Neck stiffness', 'Vomiting'],
       medicationsTaken: ['Paracetamol 650mg (last night)', 'Amlodipine 5mg OD (Hypertension)'],
       allergies: 'No known drug allergies reported',
-      existingConditions: ['Type 2 Diabetes Mellitus (Uncontrolled)', 'Hypertension'],
-      notes: 'Patient feels hot to touch. Alert and oriented. Recent blood report shows HbA1c 9.4%.'
+      existingConditions: ['Type 2 Diabetes Mellitus (Uncontrolled)', 'Essential Hypertension'],
+      notes: 'Patient feels hot to touch. Alert and oriented. Scanned blood report shows critical HbA1c 9.4%.'
     },
     documents: [
       SAMPLE_SCAN_TEMPLATES[0],
       SAMPLE_SCAN_TEMPLATES[1]
     ],
+    timelineEvents: [
+      {
+        id: 'tl-1024-1',
+        date: '14 May 2026',
+        type: 'prescription',
+        title: 'AIIMS New Delhi — OPD Prescription',
+        facility: 'AIIMS New Delhi (Dept of Medicine)',
+        summary: 'Diagnosed Essential Hypertension. Prescribed Tab Amlodipine 5mg OD, Pantoprazole 40mg.',
+        tags: ['Amlodipine 5mg', 'Hypertension', 'Diet advice']
+      },
+      {
+        id: 'tl-1024-2',
+        date: '12 Aug 2026',
+        type: 'lab_report',
+        title: 'Dr. Lal PathLabs — Comprehensive Metabolic Panel',
+        facility: 'Dr. Lal PathLabs, Delhi Central',
+        summary: 'Critical blood report: HbA1c 9.4% (Severely Elevated), Fasting Blood Sugar 214 mg/dL, Creatinine 1.42 mg/dL.',
+        tags: ['HbA1c 9.4%', 'FBS 214 mg/dL', 'Creatinine 1.42'],
+        isAbnormal: true
+      },
+      {
+        id: 'tl-1024-3',
+        date: 'Today (Intake)',
+        type: 'intake',
+        title: 'MediKiosk Pre-Consultation Voice Intake',
+        facility: 'Hospital OPD Terminal #3',
+        summary: 'Acute fever (101.4°F) & frontal headache for 3 days. Denies cough/chest pain. Paracetamol SOS taken.',
+        tags: ['Fever 101.4°F', 'Headache 3d', 'Negative Chest Pain']
+      }
+    ],
+    missingInformation: [
+      'In-clinic blood pressure & pulse measurement',
+      'Recent post-prandial blood sugar verification',
+      'Examination for neck rigidity (Kernig/Brudzinski sign to rule out meningitis)'
+    ],
     fhirBundle: {
       resourceType: 'Bundle',
       id: 'fhir-bundle-p1024',
       type: 'collection',
-      timestamp: '2026-09-11T09:45:00+05:30',
-      totalEntries: 4,
+      timestamp: '2026-09-12T09:45:00+05:30',
+      totalEntries: 5,
       fhirJson: JSON.stringify({
         resourceType: 'Bundle',
         type: 'collection',
+        meta: { profile: ['http://hl7.org/fhir/StructureDefinition/Bundle'] },
         entry: [
-          { resource: { resourceType: 'Patient', id: 'P-1024', name: [{ text: 'Rajesh Kumar' }], gender: 'male', birthDate: '1972-06-14' } },
-          { resource: { resourceType: 'Condition', code: { text: 'Fever with Headache (R50.9)' }, clinicalStatus: { coding: [{ code: 'active' }] } } },
-          { resource: { resourceType: 'Observation', code: { text: 'Body Temperature' }, valueQuantity: { value: 101.4, unit: 'degF' } } },
-          { resource: { resourceType: 'Observation', code: { text: 'HbA1c' }, valueQuantity: { value: 9.4, unit: '%' }, interpretation: [{ text: 'High' }] } }
+          { resource: { resourceType: 'Patient', id: 'P-1024', identifier: [{ system: 'https://healthid.ndhm.gov.in', value: '91-4829-1039-4821' }], name: [{ text: 'Rajesh Kumar' }], gender: 'male', birthDate: '1972-06-14' } },
+          { resource: { resourceType: 'Condition', code: { coding: [{ system: 'http://snomed.info/sct', code: '386661006', display: 'Fever with headache' }] }, clinicalStatus: { coding: [{ code: 'active' }] } } },
+          { resource: { resourceType: 'Observation', code: { coding: [{ system: 'http://loinc.org', code: '8310-5', display: 'Body temperature' }] }, valueQuantity: { value: 101.4, unit: 'degF' } } },
+          { resource: { resourceType: 'Observation', code: { coding: [{ system: 'http://loinc.org', code: '4548-4', display: 'Hemoglobin A1c' }] }, valueQuantity: { value: 9.4, unit: '%' }, interpretation: [{ text: 'High / Critical' }] } },
+          { resource: { resourceType: 'MedicationStatement', status: 'active', medicationCodeableConcept: { text: 'Amlodipine 5mg oral tablet' }, dosage: [{ text: '1 tablet once daily' }] } }
         ]
       }, null, 2)
     },
@@ -221,6 +262,172 @@ export const INITIAL_PATIENTS: Patient[] = [
       }
     ]
   },
+
+  // PATIENT B: New Patient, Bengali Voice Intake, Needs Review
+  {
+    id: 'P-1049',
+    tokenNumber: 'A-110',
+    name: 'Anita Roy',
+    age: 48,
+    gender: 'Female',
+    department: 'allopathy',
+    language: 'bn',
+    languageName: 'Bengali (বাংলা)',
+    chiefComplaint: 'Severe epigastric burning pain & recurrent nausea for 5 days',
+    status: 'Needs Review',
+    priority: 'Normal',
+    time: '09:35 AM',
+    lastVisit: 'First Visit (New Patient)',
+    intakeTimestamp: 'Today, 09:35 AM',
+    doctorReviewed: false,
+    mobile: '+91 97114 88219',
+    bloodGroup: 'O+',
+    address: 'Block B, CR Park, New Delhi 110019',
+    abhaProfile: {
+      abhaId: 'anita.roy48@abdm (Demo)',
+      abhaNumber: '91-1029-4482-7711',
+      name: 'Anita Roy',
+      gender: 'Female',
+      dob: '18-11-1977',
+      mobile: '+91 97114 88219',
+      address: 'Block B, CR Park, New Delhi 110019',
+      isLinked: true,
+      kycVerified: true
+    },
+    clinicalInfo: {
+      chiefComplaint: 'Epigastric burning pain and acid reflux worsening after spicy meals',
+      duration: '5 days',
+      severity: 'Moderate (VAS 6/10)',
+      associatedSymptoms: ['Early satiety', 'Nausea without vomiting', 'Upper abdominal fullness'],
+      deniedSymptoms: ['Hematemesis (blood in vomit)', 'Melena (black stools)', 'Chest tightness', 'Dysphagia'],
+      medicationsTaken: ['Over-the-counter antacid gel with transient relief'],
+      allergies: 'No known allergies reported',
+      existingConditions: ['Mild anxiety disorder'],
+      notes: 'Intake conducted via Bengali speech interface. Patient reports symptoms disturb night sleep.'
+    },
+    documents: [],
+    timelineEvents: [
+      {
+        id: 'tl-1049-1',
+        date: 'Today (Intake)',
+        type: 'intake',
+        title: 'New Patient Bengali Voice Registration',
+        facility: 'Hospital OPD Terminal #3',
+        summary: 'First OPD registration. Reports burning stomach pain, early satiety. Red-flag symptoms (blood in stool/vomit) denied.',
+        tags: ['Epigastric Pain', 'Dyspepsia', 'Bengali Voice Intake']
+      }
+    ],
+    missingInformation: [
+      'Helicobacter pylori antigen / prior endoscopy history',
+      'Abdominal palpation for epigastric tenderness',
+      'Evaluation of recent NSAID / painkiller consumption'
+    ],
+    conversation: [
+      {
+        id: 'msg-bn-1',
+        sender: 'ai',
+        text: 'নমস্কার অনিতা দেবী। মেডিকিয়স্কে আপনাকে স্বাগতম। আজ আপনার কী প্রধান সমস্যা হচ্ছে দয়া করে বলুন।',
+        translation: 'Hello Anita devi. Welcome to MediKiosk. Please tell us what main problem you are facing today.',
+        timestamp: '09:31 AM'
+      },
+      {
+        id: 'msg-bn-2',
+        sender: 'patient',
+        text: 'আমার গত পাঁচ দিন ধরে পেটের ওপরের দিকে খুব জ্বালা করছে আর বমি বমি ভাব হচ্ছে। খাওয়ার পর কষ্ট বাড়ে।',
+        translation: 'For the last 5 days I have severe burning sensation in the upper abdomen and feeling nauseated. Discomfort increases after eating.',
+        timestamp: '09:32 AM'
+      },
+      {
+        id: 'msg-bn-3',
+        sender: 'ai',
+        text: 'আপনার কি বমির সাথে রক্ত এসেছে বা কালো পায়খানা হয়েছে? আর বুকে চাপ অনুভব করছেন?',
+        translation: 'Have you had blood in vomit, black stools, or any chest tightness?',
+        timestamp: '09:33 AM'
+      },
+      {
+        id: 'msg-bn-4',
+        sender: 'patient',
+        text: 'না, রক্ত আসেনি আর বুকেও কোনো ব্যথা নেই। শুধু পেটে তীব্র জ্বালা।',
+        translation: 'No, no blood and no chest pain. Only severe burning in the stomach.',
+        timestamp: '09:34 AM'
+      }
+    ]
+  },
+
+  // PATIENT C: Potential Red-Flag Scenario, Priority Triage Alert
+  {
+    id: 'P-1002',
+    tokenNumber: 'EMERGENCY-01',
+    name: 'Vikramaditya Sharma',
+    age: 58,
+    gender: 'Male',
+    department: 'allopathy',
+    language: 'hi',
+    languageName: 'Hindi (हिन्दी)',
+    chiefComplaint: 'PRIORITY TRIAGE: Acute retrosternal crushing chest discomfort with left arm radiation',
+    status: 'Urgent',
+    priority: 'Urgent',
+    time: '08:30 AM',
+    lastVisit: 'First Visit',
+    intakeTimestamp: 'Today, 08:30 AM',
+    doctorReviewed: false,
+    redFlagReason: 'Potential acute coronary syndrome (retrosternal crushing pressure + diaphoresis + left arm radiation)',
+    clinicalInfo: {
+      chiefComplaint: 'Severe retrosternal crushing chest pain radiating to left jaw and shoulder',
+      duration: '45 minutes (sudden onset at rest)',
+      severity: 'Extremely severe (VAS 9/10)',
+      associatedSymptoms: ['Cold diaphoresis (profuse sweating)', 'Shortness of breath (Dyspnea)', 'Severe anxiety / sense of doom'],
+      deniedSymptoms: ['Trauma/fall', 'Fever', 'Abdominal pain'],
+      medicationsTaken: ['Sorbitrate 5mg sublingual taken 10 min ago with partial relief'],
+      allergies: 'No known drug allergies',
+      existingConditions: ['Heavy smoker (20 pack-years)', 'Hyperlipidemia'],
+      notes: 'TRIAGE PRIORITY 1: High suspicion of Acute Coronary Syndrome. Kiosk lockdown initiated. Triage nurse alerted immediately.'
+    },
+    documents: [],
+    timelineEvents: [
+      {
+        id: 'tl-1002-1',
+        date: 'Today, 08:30 AM',
+        type: 'intake',
+        title: 'Priority Red-Flag Triage Trigger',
+        facility: 'Hospital OPD Terminal #3',
+        summary: 'Emergency safety protocol triggered: Sudden-onset crushing chest pain radiating to left arm with diaphoresis. Clinical staff dispatched.',
+        tags: ['Red-Flag Triage', 'Acute Chest Pain', 'Urgent Staff Alert'],
+        isAbnormal: true
+      }
+    ],
+    missingInformation: [
+      'STAT 12-lead ECG recording (immediate requirement)',
+      'High-sensitivity Troponin-I / CK-MB cardiac biomarkers',
+      'Continuous SpO2 and non-invasive blood pressure monitoring'
+    ],
+    conversation: [
+      {
+        id: 'msg-em-1',
+        sender: 'ai',
+        text: 'नमस्ते विक्रम जी। आप क्या तकलीफ महसूस कर रहे हैं?',
+        translation: 'Namaste Vikram ji. What discomfort are you experiencing?',
+        timestamp: '08:28 AM'
+      },
+      {
+        id: 'msg-em-2',
+        sender: 'patient',
+        text: 'सीने के बीच में बहुत तेज दबाव और दर्द हो रहा है जैसे कोई पत्थर रख दिया हो! दर्द बाएं हाथ और जबड़े तक जा रहा है और बहुत पसीना आ रहा है।',
+        translation: 'Severe pressure and pain in center of chest like a heavy stone! Pain radiating to left arm and jaw with heavy sweating.',
+        timestamp: '08:29 AM'
+      },
+      {
+        id: 'msg-em-3',
+        sender: 'ai',
+        text: 'आपातकालीन अलर्ट: आपके लक्षण तत्काल चिकित्सीय ध्यान (Emergency Triage) की मांग करते हैं। अस्पताल स्टाफ को तुरंत सूचित किया जा रहा है।',
+        translation: 'EMERGENCY ALERT: Your symptoms indicate potential urgent risk. Hospital staff alerted immediately for priority review.',
+        timestamp: '08:30 AM',
+        isUrgent: true
+      }
+    ]
+  },
+
+  // PATIENT D: AYUSH Pathway, Prakriti, Agni, Koshtha & Ahara-Vihara
   {
     id: 'P-1035',
     tokenNumber: 'AY-201',
@@ -230,7 +437,7 @@ export const INITIAL_PATIENTS: Patient[] = [
     department: 'ayush',
     language: 'hi',
     languageName: 'Hindi (हिन्दी)',
-    chiefComplaint: 'Sandhivata (Bilateral knee & lumbar joint pain) with Mandagni',
+    chiefComplaint: 'Sandhivata (Bilateral knee joint pain & stiffness) with Mandagni & Krura Koshtha',
     status: 'Complete',
     priority: 'Normal',
     time: '09:30 AM',
@@ -238,7 +445,7 @@ export const INITIAL_PATIENTS: Patient[] = [
     intakeTimestamp: 'Today, 09:30 AM',
     doctorReviewed: false,
     abhaProfile: {
-      abhaId: 'rameshwar.ayush@abdm',
+      abhaId: 'rameshwar.ayush@abdm (Demo)',
       abhaNumber: '91-3312-8841-9021',
       name: 'Rameshwar Prasad',
       gender: 'Male',
@@ -250,14 +457,14 @@ export const INITIAL_PATIENTS: Patient[] = [
     },
     clinicalInfo: {
       chiefComplaint: 'Sandhivata - severe stiffness and swelling in both knee joints',
-      duration: '4 months (aggravated in rainy/cold season)',
+      duration: '4 months (aggravated in cold/rainy weather)',
       severity: 'VAS 7/10 with crepitus on movement',
-      associatedSymptoms: ['Morning stiffness > 45 mins', 'Aruchi (loss of appetite)', 'Vibandha (constipation)', 'Adhmana (abdominal bloating)'],
-      deniedSymptoms: ['Fever', 'Trauma', 'Chest tightness', 'Skin lesions'],
+      associatedSymptoms: ['Morning stiffness > 45 mins', 'Aruchi (loss of appetite)', 'Vibandha (constipation)', 'Adhmana (bloating)'],
+      deniedSymptoms: ['Fever', 'Trauma/fall', 'Chest tightness', 'Skin lesions'],
       medicationsTaken: ['Yograj Guggulu 2 tabs BD', 'Mahanarayan Taila local massage'],
       allergies: 'No known allergies',
       existingConditions: ['Chronic Sandhivata (Osteoarthritis)', 'Mild Dyspepsia'],
-      notes: 'Classical Vata-Kapha presentation. Sluggish bowel movements (Krura Koshtha) with impaired digestive fire (Mandagni).'
+      notes: 'Classical Vata-Kapha presentation. Sluggish digestion (Mandagni) with hard stools (Krura Koshtha).'
     },
     ayushAssessment: {
       prakriti: 'Vata-Kapha',
@@ -304,12 +511,37 @@ Pathya-Apathya: Avoid Dadhi, Sheetajala, Mashadi. Take warm light meals.`,
         abnormalValues: []
       }
     ],
+    timelineEvents: [
+      {
+        id: 'tl-1035-1',
+        date: '10 Feb 2026',
+        type: 'prescription',
+        title: 'IMS BHU Kayachikitsa OPD Card',
+        facility: 'Sir Sunderlal Hospital, IMS BHU',
+        summary: 'Initiated Yograj Guggulu 2 Vati BD and Dashamoola Kwatha for Janu Sandhivata.',
+        tags: ['Yograj Guggulu', 'Sandhivata', 'Pathya-Apathya']
+      },
+      {
+        id: 'tl-1035-2',
+        date: 'Today (Intake)',
+        type: 'intake',
+        title: 'AYUSH Kiosk Prakriti & Case-Taking',
+        facility: 'AYUSH OPD Terminal #3',
+        summary: 'Aggravated knee crepitus and stiffness. Mandagni (low digestive fire) and Krura Koshtha documented.',
+        tags: ['Vata-Kapha', 'Mandagni', 'Janu Stambha']
+      }
+    ],
+    missingInformation: [
+      'Nadi Pariksha (Pulse examination by Vaidya)',
+      'Jihva Pariksha (Tongue coating assessment for Ama)',
+      'Measurement of active/passive knee range of motion'
+    ],
     conversation: [
       {
         id: 'msg-ay-1',
         sender: 'ai',
-        text: 'नमस्ते आचार्य जी। आयुष ओपीडी मेडीकियोस्क में आपका स्वागत है। कृपया अपने स्वास्थ्य की स्थिति और जोड़ों के दर्द के बारे में बताएं।',
-        translation: 'Namaste Acharya ji. Welcome to AYUSH OPD MediKiosk. Please tell us about your health condition and joint pain.',
+        text: 'नमस्ते आचार्य जी। आयुष ओपीडी मेडीकियोस्क में आपका स्वागत है। कृपया अपने जोड़ों के दर्द और पाचन की स्थिति बताएं।',
+        translation: 'Namaste Acharya ji. Welcome to AYUSH OPD MediKiosk. Please tell us about your joint pain and digestive state.',
         timestamp: '09:25 AM'
       },
       {
@@ -332,131 +564,6 @@ Pathya-Apathya: Avoid Dadhi, Sheetajala, Mashadi. Take warm light meals.`,
         text: 'भूख बहुत कम लगती है, खाना पचने में बहुत समय लगता है। पेट साफ होने में बहुत जोर लगाना पड़ता है, दो-तीन दिन में एक बार होता है।',
         translation: 'Appetite is very sluggish, food takes long to digest. Bowel movements are hard, once in 2-3 days.',
         timestamp: '09:28 AM'
-      },
-      {
-        id: 'msg-ay-5',
-        sender: 'ai',
-        text: 'क्या आप कोई आयुर्वेदिक दवा या तेल इस्तेमाल कर रहे हैं? और खान-पान में ठंडा पानी या भारी भोजन लेते हैं?',
-        translation: 'Are you taking any Ayurvedic medicine or oil? And in your diet do you take cold water or heavy foods?',
-        timestamp: '09:29 AM'
-      },
-      {
-        id: 'msg-ay-6',
-        sender: 'patient',
-        text: 'योगराज गुग्गुलु ले रहा हूँ और महानारायण तेल लगाता हूँ। ठंडा पानी पीने की आदत है।',
-        translation: 'Taking Yograj Guggulu and applying Mahanarayana oil. Accustomed to drinking cold water.',
-        timestamp: '09:29 AM'
-      }
-    ]
-  },
-  {
-    id: 'P-1048',
-    tokenNumber: 'A-108',
-    name: 'Sunita Devi',
-    age: 67,
-    gender: 'Female',
-    department: 'allopathy',
-    language: 'hi',
-    languageName: 'Hindi (हिन्दी)',
-    chiefComplaint: 'Bilateral knee joint pain & difficulty climbing stairs',
-    status: 'Complete',
-    priority: 'Normal',
-    time: '09:20 AM',
-    lastVisit: '19 Nov 2025',
-    intakeTimestamp: 'Today, 09:20 AM',
-    doctorReviewed: false,
-    abhaProfile: {
-      abhaId: 'sunita.devi67@abdm',
-      abhaNumber: '91-8821-4902-1144',
-      name: 'Sunita Devi',
-      gender: 'Female',
-      dob: '28-09-1959',
-      mobile: '+91 98112 33445',
-      address: 'Flat 302, Green Park Extension, New Delhi 110016',
-      isLinked: true,
-      kycVerified: true
-    },
-    clinicalInfo: {
-      chiefComplaint: 'Bilateral knee joint pain & stiffness',
-      duration: '3 weeks (worsened over past 4 days)',
-      severity: 'Severe on standing or climbing stairs (VAS 7/10)',
-      associatedSymptoms: ['Morning stiffness (~30 mins)', 'Mild swelling in right knee'],
-      deniedSymptoms: ['Fever', 'Trauma/fall', 'Numbness in toes', 'Skin redness'],
-      medicationsTaken: ['Calcium + Vit D3 500mg daily'],
-      allergies: 'Penicillin allergy (skin rash)',
-      existingConditions: ['Known Osteoarthritis (diagnosed 2024)', 'Type 2 Diabetes'],
-      notes: 'Requires support to stand up. Walking with a mild limp. Prior arthroscopy in 2025.'
-    },
-    documents: [
-      SAMPLE_SCAN_TEMPLATES[2]
-    ],
-    conversation: [
-      {
-        id: 'msg-1',
-        sender: 'ai',
-        text: 'नमस्ते सुनीता जी। कृपया अपनी तकलीफ के बारे में बताएं।',
-        translation: 'Hello Sunita ji. Please tell us about your discomfort.',
-        timestamp: '09:15 AM'
-      },
-      {
-        id: 'msg-2',
-        sender: 'patient',
-        text: 'मेरे दोनों घुटनों में बहुत दर्द रहता है, खासकर सीधे पैर में। चलने-फिरने में बड़ी तकलीफ होती है।',
-        translation: 'I have severe pain in both knees, especially right leg. Finding it very difficult to walk.',
-        timestamp: '09:16 AM'
-      }
-    ]
-  },
-  {
-    id: 'P-1002',
-    tokenNumber: 'EMERGENCY-01',
-    name: 'Vikramaditya Sharma',
-    age: 58,
-    gender: 'Male',
-    department: 'allopathy',
-    language: 'hi',
-    languageName: 'Hindi (हिन्दी)',
-    chiefComplaint: 'CRITICAL: Acute retrosternal chest pain with left arm radiation',
-    status: 'Urgent',
-    priority: 'Urgent',
-    time: '08:30 AM',
-    lastVisit: 'First Visit',
-    intakeTimestamp: 'Today, 08:30 AM',
-    doctorReviewed: false,
-    clinicalInfo: {
-      chiefComplaint: 'Severe retrosternal crushing chest pain radiating to left jaw and shoulder',
-      duration: '45 minutes (sudden onset at rest)',
-      severity: 'Extremely severe (VAS 9/10)',
-      associatedSymptoms: ['Cold diaphoresis (profuse sweating)', 'Shortness of breath (Dyspnea)', 'Severe anxiety / feeling of impending doom'],
-      deniedSymptoms: ['Trauma', 'Fever', 'Abdominal pain'],
-      medicationsTaken: ['Sorbitrate 5mg sublingual taken 10 min ago with partial relief'],
-      allergies: 'No known drug allergies',
-      existingConditions: ['Heavy smoker (20 pack-years)', 'Hyperlipidemia'],
-      notes: 'TRIAGE PRIORITY 1 EMERGENCY: High suspicion of Acute Coronary Syndrome (STEMI / NSTEMI). STAT 12-lead ECG and Cardiology call required.'
-    },
-    documents: [],
-    conversation: [
-      {
-        id: 'msg-em-1',
-        sender: 'ai',
-        text: 'नमस्ते विक्रम जी। आप क्या तकलीफ महसूस कर रहे हैं?',
-        translation: 'Namaste Vikram ji. What discomfort are you experiencing?',
-        timestamp: '08:28 AM'
-      },
-      {
-        id: 'msg-em-2',
-        sender: 'patient',
-        text: 'सीने के बीच में बहुत तेज दबाव और दर्द हो रहा है जैसे कोई पत्थर रख दिया हो! दर्द बाएं हाथ और जबड़े तक जा रहा है और बहुत पसीना आ रहा है।',
-        translation: 'Severe pressure and pain in center of chest like a heavy stone! Pain radiating to left arm and jaw with heavy sweating.',
-        timestamp: '08:29 AM'
-      },
-      {
-        id: 'msg-em-3',
-        sender: 'ai',
-        text: 'आपातकालीन अलर्ट: आपके लक्षण तत्काल चिकित्सीय ध्यान (Emergency Triage) की मांग करते हैं। नर्स को तुरंत सूचित किया जा रहा है।',
-        translation: 'EMERGENCY ALERT: Your symptoms require immediate medical attention. Triage team alerted.',
-        timestamp: '08:30 AM',
-        isUrgent: true
       }
     ]
   }
