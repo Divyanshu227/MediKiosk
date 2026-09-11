@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { 
   CheckCircle2, 
   Send, 
@@ -7,14 +7,19 @@ import {
   ShieldCheck, 
   Printer, 
   Pill, 
-  User,
-  QrCode,
-  FileText,
-  Activity,
-  Leaf,
-  Code2
+  User, 
+  QrCode, 
+  FileText, 
+  Activity, 
+  Leaf, 
+  Code2,
+  Stethoscope,
+  AlertTriangle,
+  Clock,
+  Building2,
+  HelpCircle,
+  ArrowRight
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 import { useApp } from '../../context/AppContext';
 
 export const ClinicalSummaryScreen: React.FC = () => {
@@ -32,48 +37,40 @@ export const ClinicalSummaryScreen: React.FC = () => {
   const [showFhirRaw, setShowFhirRaw] = useState(false);
   const lang = getLanguageDetails(activePatient.language);
   const fhirBundle = generateFhirBundle();
-
-  useEffect(() => {
-    try {
-      confetti({
-        particleCount: 40,
-        spread: 45,
-        origin: { y: 0.6 }
-      });
-    } catch {
-      // ignore
-    }
-  }, []);
+  const docs = activePatient.documents || [];
 
   const handleSendToDoctor = () => {
     sendActivePatientToDoctor();
     setIsSent(true);
     setTimeout(() => {
       setCurrentScreen('doctor-dashboard');
-    }, 1200);
+    }, 1000);
   };
 
   const handlePrint = () => {
     window.print();
   };
 
-  const docs = activePatient.documents || [];
-
   return (
-    <div className="flex-1 flex flex-col justify-center max-w-3xl mx-auto w-full px-4 sm:px-6 py-6 animate-fadeIn">
+    <div className="flex-1 flex flex-col justify-center max-w-4xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-6 animate-fadeIn">
       
-      {/* Top Success Banner */}
-      <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-emerald-50 border border-emerald-200 p-3.5 sm:p-4 rounded-xl">
-        <div className="flex items-center space-x-2.5">
-          <div className="w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold shrink-0">
-            <CheckCircle2 className="w-5 h-5" />
+      {/* Top Professional Confirmation Banner */}
+      <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white border border-slate-200 p-3.5 sm:p-4 rounded-xl shadow-xs">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-teal-800 flex items-center justify-center shrink-0">
+            <CheckCircle2 className="w-6 h-6 text-teal-700" />
           </div>
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
-              Pre-Consultation Intake Ready
-            </span>
-            <h1 className="text-base sm:text-lg font-bold text-emerald-950">
-              OPD Token #{activePatient.tokenNumber} Generated
+            <div className="flex items-center space-x-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-teal-800 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded">
+                Step 9 of 9 • Intake Summary
+              </span>
+              <span className="text-xs font-mono font-bold text-slate-800">
+                Token #{activePatient.tokenNumber}
+              </span>
+            </div>
+            <h1 className="text-lg font-bold text-slate-900 mt-0.5">
+              Clinical Intake Formatted & Ready for Doctor
             </h1>
           </div>
         </div>
@@ -81,17 +78,17 @@ export const ClinicalSummaryScreen: React.FC = () => {
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setShowFhirRaw(!showFhirRaw)}
-            className="p-1.5 px-3 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold flex items-center space-x-1.5 transition-colors shadow-2xs"
+            className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold flex items-center space-x-1.5 transition-colors shadow-2xs"
           >
             <Code2 className="w-3.5 h-3.5 text-teal-700" />
-            <span>{showFhirRaw ? 'Hide FHIR' : 'View FHIR JSON'}</span>
+            <span>{showFhirRaw ? 'Hide FHIR' : 'FHIR R4 JSON'}</span>
           </button>
           <button
             onClick={handlePrint}
-            className="p-1.5 px-3 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold flex items-center space-x-1.5 transition-colors shadow-2xs"
+            className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center space-x-1.5 transition-colors"
           >
             <Printer className="w-3.5 h-3.5" />
-            <span>Print Token Slip</span>
+            <span>Print Slip</span>
           </button>
         </div>
       </div>
@@ -101,192 +98,282 @@ export const ClinicalSummaryScreen: React.FC = () => {
         <div className="mb-4 p-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 space-y-2 animate-fadeIn">
           <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-800">
             <span className="font-bold text-teal-400 font-mono">
-              ABDM FHIR Resource Bundle (HL7 FHIR R4)
+              ABDM FHIR R4 Collection Bundle (Demo Payload)
             </span>
             <span className="text-[10px] text-slate-400">Total Entries: {fhirBundle.totalEntries}</span>
           </div>
-          <pre className="font-mono text-[11px] text-emerald-400 max-h-48 overflow-y-auto whitespace-pre-wrap">
+          <pre className="font-mono text-[11px] text-emerald-400 max-h-56 overflow-y-auto whitespace-pre-wrap">
             {fhirBundle.fhirJson}
           </pre>
         </div>
       )}
 
-      {/* Official OPD Token Slip Card */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-4">
+      {/* Clinical Summary Card */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden mb-5">
         
-        {/* Slip Header */}
+        {/* Header Ribbon */}
         <div className="bg-slate-900 p-4 sm:p-5 text-white">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center space-x-3">
-              <div className="w-11 h-11 rounded-lg bg-teal-500/20 border border-teal-400/30 flex items-center justify-center font-bold text-teal-300 text-base shrink-0">
-                <QrCode className="w-6 h-6 text-teal-400" />
+              <div className="w-9 h-9 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold">
+                <Activity className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <h2 className="text-base sm:text-lg font-bold">{activePatient.name}</h2>
-                  <span className="px-2 py-0.5 rounded bg-teal-700 text-white text-xs font-mono font-bold">
-                    #{activePatient.tokenNumber}
+                  <span className="text-base font-bold tracking-tight">Hospital Outpatient Department</span>
+                  <span className="text-[10px] font-bold bg-teal-800 text-teal-200 border border-teal-600 px-2 py-0.5 rounded uppercase">
+                    Terminal #3 Intake
                   </span>
                 </div>
-                <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-300 mt-0.5 font-normal">
-                  <span>{activePatient.age}y</span>
-                  <span>•</span>
-                  <span>{activePatient.gender}</span>
-                  <span>•</span>
-                  <span>Dept: <strong className="text-teal-300">{clinicalDepartment === 'ayush' ? 'AYUSH Kayachikitsa' : 'General Medicine'}</strong></span>
-                  <span>•</span>
-                  <span>Language: <strong className="text-teal-300">{lang.name}</strong></span>
-                </div>
+                <p className="text-xs text-slate-400">
+                  Pre-Consultation Case Record • Attending: Dr. Sharma (Room 204)
+                </p>
               </div>
             </div>
 
-            <div className="text-left sm:text-right">
-              <span className="text-[10px] uppercase tracking-wider text-slate-400 block">ABDM Sync</span>
-              <span className="text-xs font-mono font-semibold text-emerald-400">
-                {activePatient.abhaProfile?.abhaId || 'Linked via ABHA'}
-              </span>
+            <div className="text-right sm:border-l sm:border-slate-700 sm:pl-4">
+              <div className="text-[10px] text-slate-400 uppercase font-mono tracking-wider">Patient UHID / Token</div>
+              <div className="text-base font-mono font-bold text-teal-300">
+                {activePatient.id} • #{activePatient.tokenNumber}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Slip Content Sections */}
-        <div className="p-4 sm:p-5 space-y-3.5 text-xs text-slate-800">
+        {/* Patient Demographics Bar */}
+        <div className="px-5 py-3 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="flex items-center space-x-3">
+            <span className="font-bold text-slate-900">{activePatient.name}</span>
+            <span className="text-slate-500">{activePatient.age}y / {activePatient.gender}</span>
+            <span className="text-slate-400">•</span>
+            <span className="text-slate-600">Language: <strong>{lang.name}</strong></span>
+          </div>
+          <div className="flex items-center space-x-2 text-slate-600 font-mono text-[11px]">
+            <span>ABHA: {activePatient.abhaProfile?.abhaId || 'Demo Linked'}</span>
+          </div>
+        </div>
+
+        {/* Structured Clinical Summary Sections */}
+        <div className="p-5 sm:p-6 space-y-4 text-xs text-slate-700">
           
-          <div className="border-b border-slate-100 pb-3">
-            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center space-x-1.5">
-              <Activity className="w-3.5 h-3.5 text-teal-700" />
-              <span>Chief Presenting Complaint</span>
-            </h3>
-            <p className="text-sm font-bold text-slate-900">
-              {activePatient.clinicalInfo.chiefComplaint}
-            </p>
+          {/* 1. Chief Complaint & 2. HPI */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-3 border-b border-slate-100">
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                1. Chief Complaint
+              </span>
+              <p className="font-bold text-slate-900 text-xs">
+                {activePatient.clinicalInfo.chiefComplaint}
+              </p>
+            </div>
+
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                2. Present Illness (HPI)
+              </span>
+              <p className="text-slate-700 font-medium">
+                Duration: <strong className="text-slate-900">{activePatient.clinicalInfo.duration}</strong> • Severity: <strong className="text-amber-800">{activePatient.clinicalInfo.severity}</strong>
+              </p>
+            </div>
           </div>
 
-          <div className="border-b border-slate-100 pb-3">
-            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 flex items-center space-x-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-teal-700"></span>
-              <span>History of Present Illness (HPI)</span>
-            </h3>
-            <ul className="space-y-1 text-xs text-slate-700">
-              <li className="flex items-start space-x-2">
-                <span className="w-1 h-1 rounded-full bg-teal-700 mt-1.5 shrink-0"></span>
-                <span>Duration / Onset: <strong>{activePatient.clinicalInfo.duration || '3 days'}</strong>.</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span className="w-1 h-1 rounded-full bg-teal-700 mt-1.5 shrink-0"></span>
-                <span>Severity / Temperature: <strong>{activePatient.clinicalInfo.severity} ({activePatient.clinicalInfo.temperature || '~101°F'})</strong>.</span>
-              </li>
-              {activePatient.clinicalInfo.associatedSymptoms.map((sym, i) => (
-                <li key={i} className="flex items-start space-x-2">
-                  <span className="w-1 h-1 rounded-full bg-teal-700 mt-1.5 shrink-0"></span>
-                  <span>Positive symptoms: <strong>{sym}</strong>.</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* AYUSH Assessment Callout if active */}
-          {clinicalDepartment === 'ayush' && activePatient.ayushAssessment && (
-            <div className="border-b border-slate-100 pb-3">
-              <h3 className="text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-1 flex items-center space-x-1.5">
-                <Leaf className="w-3.5 h-3.5 text-amber-700" />
-                <span>Dashavidha Pariksha Highlights</span>
-              </h3>
-              <div className="grid grid-cols-3 gap-2 text-xs">
-                <div className="p-2 bg-amber-50/50 rounded border border-amber-200">
-                  <span className="text-[10px] text-slate-500 block">Agni:</span>
-                  <span className="font-bold text-amber-900">{activePatient.ayushAssessment.agni}</span>
-                </div>
-                <div className="p-2 bg-amber-50/50 rounded border border-amber-200">
-                  <span className="text-[10px] text-slate-500 block">Koshtha:</span>
-                  <span className="font-bold text-amber-900">{activePatient.ayushAssessment.koshtha}</span>
-                </div>
-                <div className="p-2 bg-amber-50/50 rounded border border-amber-200">
-                  <span className="text-[10px] text-slate-500 block">Prakriti:</span>
-                  <span className="font-bold text-amber-900">{activePatient.ayushAssessment.prakriti}</span>
-                </div>
+          {/* 3. Positive Symptoms & 4. Negative Symptoms */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-3 border-b border-slate-100">
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center space-x-1">
+                <CheckCircle2 className="w-3 h-3 text-teal-700" />
+                <span>3. Positive Symptoms</span>
+              </span>
+              <div className="flex flex-wrap gap-1">
+                {activePatient.clinicalInfo.associatedSymptoms.map((s, i) => (
+                  <span key={i} className="px-2 py-0.5 rounded bg-teal-50 text-teal-800 border border-teal-200 text-[11px] font-semibold">
+                    + {s}
+                  </span>
+                ))}
               </div>
             </div>
-          )}
 
-          {/* Scanned Prior Docs & Abnormal Flags */}
-          <div className="border-b border-slate-100 pb-3">
-            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center space-x-1.5">
-              <FileText className="w-3.5 h-3.5 text-teal-700" />
-              <span>Prior Medical Documents & Timeline</span>
-            </h3>
-            {docs.length > 0 ? (
-              <p className="text-xs font-semibold text-slate-800">
-                {docs.length} prior files digitized ({docs.map(d => d.title).join('; ')})
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center space-x-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-[8px] font-bold">✕</span>
+                <span>4. Denied / Negative Symptoms</span>
+              </span>
+              <div className="flex flex-wrap gap-1">
+                {(activePatient.clinicalInfo.deniedSymptoms && activePatient.clinicalInfo.deniedSymptoms.length > 0
+                  ? activePatient.clinicalInfo.deniedSymptoms
+                  : ['No chest pain', 'No dyspnea', 'No vomiting', 'No cough']
+                ).map((s, i) => (
+                  <span key={i} className="px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 text-[11px] font-medium">
+                    ✕ {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 5. Past Medical History, 6. Medications, 7. Allergies */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pb-3 border-b border-slate-100">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                5. Past Medical History
+              </span>
+              <p className="font-semibold text-slate-800">
+                {activePatient.clinicalInfo.existingConditions.join(', ') || 'None declared'}
               </p>
+            </div>
+
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                6. Current Medications
+              </span>
+              <p className="font-semibold text-slate-800">
+                {activePatient.clinicalInfo.medicationsTaken.join(', ') || 'None taken'}
+              </p>
+            </div>
+
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                7. Known Drug Allergies
+              </span>
+              <p className="font-semibold text-slate-800">
+                {activePatient.clinicalInfo.allergies || 'No known drug allergies reported'}
+              </p>
+            </div>
+          </div>
+
+          {/* 8. Family / Personal History & 9. Investigations */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-3 border-b border-slate-100">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                8. Family & Personal History
+              </span>
+              <p className="text-slate-600">
+                Non-smoker, non-alcoholic. Family history of Type 2 Diabetes noted.
+              </p>
+            </div>
+
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                9. Recent Investigations (Scanned Records)
+              </span>
+              <p className="text-slate-800 font-semibold">
+                {docs.length > 0 ? `${docs.length} records processed: ${docs.map(d => d.title).join(', ')}` : 'No prior lab reports attached'}
+              </p>
+            </div>
+          </div>
+
+          {/* 10. Document Timeline & 11. Missing Information Gaps */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-3 border-b border-slate-100">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                10. Document Timeline
+              </span>
+              <p className="text-slate-600">
+                {activePatient.timelineEvents?.length || docs.length + 1} chronological events mapped.
+              </p>
+            </div>
+
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 block mb-1 flex items-center space-x-1">
+                <HelpCircle className="w-3 h-3 text-amber-700" />
+                <span>11. Focus Areas & History Gaps</span>
+              </span>
+              <ul className="list-disc pl-4 text-slate-600 space-y-0.5 text-[11px]">
+                {(activePatient.missingInformation || [
+                  'In-clinic blood pressure check required',
+                  'Post-prandial blood sugar verification'
+                ]).map((gap, i) => (
+                  <li key={i}>{gap}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* 12. Triage Priority & 13. AYUSH (if applicable) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                  12. Clinical Triage Priority
+                </span>
+                <span className={`text-xs font-bold px-2 py-0.5 rounded uppercase ${
+                  activePatient.priority === 'Urgent' 
+                    ? 'bg-red-100 text-red-800' 
+                    : activePatient.priority === 'High' 
+                    ? 'bg-amber-100 text-amber-900' 
+                    : 'bg-teal-100 text-teal-800'
+                }`}>
+                  {activePatient.priority} Priority
+                </span>
+              </div>
+              <span className="text-[11px] text-slate-500">OPD Room 204</span>
+            </div>
+
+            {clinicalDepartment === 'ayush' && activePatient.ayushAssessment ? (
+              <div className="p-2.5 rounded-lg bg-amber-50/60 border border-amber-200">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-900 block mb-0.5">
+                  13. AYUSH Dashavidha Assessment
+                </span>
+                <p className="text-xs font-bold text-amber-950">
+                  {activePatient.ayushAssessment.prakriti} • Agni: {activePatient.ayushAssessment.agni} • Koshtha: {activePatient.ayushAssessment.koshtha}
+                </p>
+              </div>
             ) : (
-              <p className="text-xs text-slate-500 italic">No prior physical files attached.</p>
+              <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                    13. Clinical Department
+                  </span>
+                  <span className="text-xs font-bold text-slate-800">
+                    General Medicine (Internal Medicine OPD)
+                  </span>
+                </div>
+              </div>
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 border-b border-slate-100 pb-3">
-            <div>
-              <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center space-x-1">
-                <Pill className="w-3 h-3 text-indigo-600" />
-                <span>Medications Reported</span>
-              </h3>
-              <p className="font-semibold text-slate-900">
-                {activePatient.clinicalInfo.medicationsTaken.join(', ') || 'None reported'}
-              </p>
-            </div>
+        </div>
 
-            <div>
-              <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center space-x-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                <span>Allergies</span>
-              </h3>
-              <p className="font-semibold text-slate-900">
-                {activePatient.clinicalInfo.allergies || 'Not reported / No known drug allergies'}
-              </p>
-            </div>
+        {/* Ethical Non-Diagnostic Reminder */}
+        <div className="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+          <div className="flex items-center space-x-2">
+            <ShieldCheck className="w-4 h-4 text-teal-700 shrink-0" />
+            <span>
+              <strong>Intake Support:</strong> This summary organizes patient-reported history. Doctor conducts examination and provides diagnosis.
+            </span>
           </div>
-
-          <div className="p-3 rounded-lg bg-teal-50 border border-teal-200 flex items-start space-x-2 text-xs text-teal-950">
-            <ShieldCheck className="w-4 h-4 text-teal-700 shrink-0 mt-0.5" />
-            <div>
-              <strong className="font-semibold">Pushed to Hospital Information System (HIS) via FHIR API.</strong>
-              <p className="text-teal-900 text-[11px] mt-0.5">
-                The doctor will see this complete structured history before you step into the OPD room.
-              </p>
-            </div>
-          </div>
-
         </div>
 
       </div>
 
-      {/* Actions */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5">
+      {/* Action Footer */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="flex items-center space-x-2 w-full sm:w-auto">
           <button
             onClick={() => setCurrentScreen('doctor-conversation')}
-            className="flex-1 sm:flex-initial px-3.5 py-2 rounded-lg bg-white hover:bg-slate-50 text-slate-800 font-medium text-xs border border-slate-200 transition-colors flex items-center justify-center space-x-1.5 shadow-sm"
+            className="px-3.5 py-2 rounded-lg bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs border border-slate-200 transition-colors flex items-center space-x-1.5 shadow-2xs"
           >
             <MessageSquare className="w-3.5 h-3.5 text-teal-700" />
-            <span>View Transcript</span>
+            <span>Audio Transcript</span>
           </button>
 
           <button
             onClick={resetPatientFlow}
-            className="flex-1 sm:flex-initial px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs transition-colors flex items-center justify-center space-x-1.5"
+            className="px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-colors flex items-center space-x-1.5"
           >
             <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
-            <span>Next Patient</span>
+            <span>Reset</span>
           </button>
         </div>
 
         <button
           id="btn-send-to-doctor"
           onClick={handleSendToDoctor}
-          className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-semibold text-xs sm:text-sm shadow-sm transition-all flex items-center justify-center space-x-2 cursor-pointer"
+          className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs sm:text-sm shadow-sm transition-all flex items-center justify-center space-x-2 cursor-pointer"
         >
-          <Send className="w-3.5 h-3.5" />
-          <span>{isSent ? 'Transmitting to EMR...' : 'Send to Doctor & Open Consultation Portal'}</span>
+          <Send className="w-4 h-4" />
+          <span>{isSent ? 'Transmitting to Workstation...' : 'Send to Doctor & Open OPD Portal'}</span>
+          <ArrowRight className="w-4 h-4" />
         </button>
       </div>
 
