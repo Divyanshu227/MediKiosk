@@ -76,7 +76,7 @@ export const PatientIdentification: React.FC = () => {
     e.preventDefault();
     const result = loginPatientByMobileOrId(loginQuery, loginOtp);
     if (result.success) {
-      setCurrentScreen('language');
+      setCurrentScreen('consent');
     } else {
       setLoginError(result.error || 'Authentication failed.');
     }
@@ -94,8 +94,8 @@ export const PatientIdentification: React.FC = () => {
       department: clinicalDepartment
     });
 
-    showToast(`Profile & ABHA ID generated for ${created.name}!`);
-    setCurrentScreen('language');
+    showToast(`Profile & Demo ABHA generated for ${created.name}!`);
+    setCurrentScreen('consent');
   };
 
   return (
@@ -165,41 +165,44 @@ export const PatientIdentification: React.FC = () => {
         </div>
 
         {/* Tab Selection */}
-        <div className="flex border-b border-slate-200">
+        <div className="flex border-b border-slate-200 overflow-x-auto scrollbar-none">
           <button
             onClick={() => setActiveTab('register')}
-            className={`flex-1 py-2.5 text-xs font-bold border-b-2 flex items-center justify-center space-x-2 transition-all ${
+            className={`flex-1 min-w-[120px] py-2 sm:py-2.5 px-2 text-xs font-bold border-b-2 flex items-center justify-center space-x-1.5 transition-all whitespace-nowrap ${
               activeTab === 'register'
                 ? 'border-teal-700 text-teal-800 bg-teal-50/20'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            <UserPlus className="w-4 h-4" />
-            <span>1. New Patient Registration Form</span>
+            <UserPlus className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="hidden sm:inline">1. New Patient Registration</span>
+            <span className="sm:hidden">1. Register</span>
           </button>
 
           <button
             onClick={() => setActiveTab('login')}
-            className={`flex-1 py-2.5 text-xs font-bold border-b-2 flex items-center justify-center space-x-2 transition-all ${
+            className={`flex-1 min-w-[120px] py-2 sm:py-2.5 px-2 text-xs font-bold border-b-2 flex items-center justify-center space-x-1.5 transition-all whitespace-nowrap ${
               activeTab === 'login'
                 ? 'border-teal-700 text-teal-800 bg-teal-50/20'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            <UserCheck className="w-4 h-4" />
-            <span>2. Returning Patient Login (Mobile / ABHA)</span>
+            <UserCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="hidden sm:inline">2. Returning Patient Login</span>
+            <span className="sm:hidden">2. Returning</span>
           </button>
 
           <button
             onClick={() => setActiveTab('abha_scan')}
-            className={`flex-1 py-2.5 text-xs font-bold border-b-2 flex items-center justify-center space-x-2 transition-all ${
+            className={`flex-1 min-w-[110px] py-2 sm:py-2.5 px-2 text-xs font-bold border-b-2 flex items-center justify-center space-x-1.5 transition-all whitespace-nowrap ${
               activeTab === 'abha_scan'
                 ? 'border-teal-700 text-teal-800 bg-teal-50/20'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            <QrCode className="w-4 h-4" />
-            <span>3. Scan ABHA Card</span>
+            <QrCode className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="hidden sm:inline">3. Scan ABHA Card</span>
+            <span className="sm:hidden">3. ABHA QR</span>
           </button>
         </div>
 
@@ -207,12 +210,12 @@ export const PatientIdentification: React.FC = () => {
         {activeTab === 'register' && (
           <form onSubmit={handleRegisterSubmit} className="space-y-4 animate-fadeIn">
             
-            <div className="p-3 bg-teal-50 border border-teal-200 rounded-lg flex items-center justify-between text-xs text-teal-900">
+            <div className="p-2.5 bg-teal-50 border border-teal-200 rounded-lg flex items-center justify-between text-xs text-teal-900">
               <span className="flex items-center space-x-1.5 font-semibold">
-                <ShieldCheck className="w-4 h-4 text-teal-700" />
-                <span>Ayushman Bharat Health Account (ABHA) will be automatically created & linked.</span>
+                <ShieldCheck className="w-4 h-4 text-teal-700 shrink-0" />
+                <span>ABHA Health Account will be created & linked to your intake.</span>
               </span>
-              <span className="text-[10px] bg-white border border-teal-200 px-2 py-0.5 rounded font-bold uppercase">
+              <span className="text-[10px] bg-white border border-teal-200 px-2 py-0.5 rounded font-bold uppercase shrink-0">
                 ABDM Enabled
               </span>
             </div>
@@ -386,7 +389,7 @@ export const PatientIdentification: React.FC = () => {
                   Preferred ABHA Address: <span className="text-teal-800 font-mono">@{regForm.preferredAbhaAddress || 'username'}.abdm</span>
                 </span>
                 <p className="text-[11px] text-slate-500">
-                  Allows instant synchronization of today's OPD consultation to your Government Ayushman Bharat health locker.
+                  Syncs today's OPD consultation to your Ayushman Bharat health locker.
                 </p>
               </div>
 
@@ -404,7 +407,7 @@ export const PatientIdentification: React.FC = () => {
                 type="submit"
                 className="w-full sm:w-auto px-7 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center space-x-2 cursor-pointer"
               >
-                <span>Complete Registration & Proceed to Language</span>
+                <span>Complete & Continue</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -437,38 +440,65 @@ export const PatientIdentification: React.FC = () => {
             </div>
 
             {/* Quick Demo Pre-fills */}
-            <div className="space-y-1">
-              <span className="text-[10px] text-slate-500 font-semibold block">Quick Patient Presets:</span>
-              <div className="flex flex-wrap gap-1.5">
+            <div className="space-y-1.5">
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">
+                SIH Judging Demo Scenarios (One-Click Select):
+              </span>
+              <div className="grid grid-cols-2 gap-1.5">
                 <button
                   type="button"
                   onClick={() => {
                     setLoginQuery('P-1024');
                     setClinicalDepartment('allopathy');
                   }}
-                  className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-mono border border-slate-200"
+                  className={`p-2 rounded-lg text-left text-xs border transition-all ${
+                    loginQuery === 'P-1024' ? 'bg-teal-50 border-teal-500 font-bold text-teal-900' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                  }`}
                 >
-                  P-1024 (Rajesh - Fever/DM)
+                  <div className="font-bold">Case A: Rajesh Kumar</div>
+                  <div className="text-[10px] text-slate-500">Returning • Allopathy • Multi-Records</div>
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoginQuery('P-1049');
+                    setClinicalDepartment('allopathy');
+                  }}
+                  className={`p-2 rounded-lg text-left text-xs border transition-all ${
+                    loginQuery === 'P-1049' ? 'bg-teal-50 border-teal-500 font-bold text-teal-900' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <div className="font-bold">Case B: Anita Roy</div>
+                  <div className="text-[10px] text-slate-500">New • Bengali Voice • Needs Review</div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoginQuery('P-1002');
+                    setClinicalDepartment('allopathy');
+                  }}
+                  className={`p-2 rounded-lg text-left text-xs border transition-all ${
+                    loginQuery === 'P-1002' ? 'bg-red-50 border-red-500 font-bold text-red-900' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <div className="font-bold text-red-700">Case C: Vikramaditya</div>
+                  <div className="text-[10px] text-red-600">Red-Flag • Acute Chest Discomfort</div>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => {
                     setLoginQuery('P-1035');
                     setClinicalDepartment('ayush');
                   }}
-                  className="px-2 py-1 rounded bg-amber-50 hover:bg-amber-100 text-amber-900 text-[11px] font-mono border border-amber-200"
+                  className={`p-2 rounded-lg text-left text-xs border transition-all ${
+                    loginQuery === 'P-1035' ? 'bg-amber-50 border-amber-500 font-bold text-amber-900' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                  }`}
                 >
-                  P-1035 (Acharya - Sandhivata)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLoginQuery('P-1048');
-                    setClinicalDepartment('allopathy');
-                  }}
-                  className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-mono border border-slate-200"
-                >
-                  P-1048 (Sunita - Knee Pain)
+                  <div className="font-bold text-amber-900">Case D: Acharya Rameshwar</div>
+                  <div className="text-[10px] text-amber-700">AYUSH • Sandhivata & Prakriti</div>
                 </button>
               </div>
             </div>
@@ -478,7 +508,7 @@ export const PatientIdentification: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
                   <KeyRound className="w-3.5 h-3.5 text-teal-700" />
-                  <span>Authentication OTP</span>
+                  <span>Authentication OTP (Demo)</span>
                 </span>
                 <button
                   type="button"
@@ -509,7 +539,7 @@ export const PatientIdentification: React.FC = () => {
               type="submit"
               className="w-full py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center space-x-2"
             >
-              <span>Login & Continue to Intake</span>
+              <span>Verify & Continue to Consent</span>
               <ArrowRight className="w-4 h-4" />
             </button>
 
@@ -525,7 +555,7 @@ export const PatientIdentification: React.FC = () => {
             <div>
               <h3 className="text-sm font-bold text-slate-900">Hold your ABHA Card or QR to the Scanner</h3>
               <p className="text-xs text-slate-500 mt-1">
-                The kiosk optical scanner will read your ABDM demographic data automatically.
+                The kiosk optical scanner reads your ABDM demographic data automatically (Demo Simulation).
               </p>
             </div>
 
@@ -533,7 +563,7 @@ export const PatientIdentification: React.FC = () => {
               type="button"
               onClick={() => {
                 loginPatientByMobileOrId('P-1024');
-                setCurrentScreen('language');
+                setCurrentScreen('consent');
               }}
               className="px-5 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs shadow-sm transition-all inline-flex items-center space-x-2"
             >

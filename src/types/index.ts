@@ -6,6 +6,8 @@ export type ScreenType =
   | 'voice-intake'
   | 'ai-conversation'
   | 'document-scanner'
+  | 'timeline'
+  | 'red-flag'
   | 'review'
   | 'clinical-summary'
   | 'doctor-dashboard'
@@ -51,6 +53,7 @@ export interface ClinicalInfo {
   duration: string;
   severity: string;
   temperature?: string;
+  bloodPressure?: string;
   associatedSymptoms: string[];
   deniedSymptoms: string[];
   medicationsTaken: string[];
@@ -169,6 +172,17 @@ export interface DoctorUser {
   isLoggedIn: boolean;
 }
 
+export interface TimelineEvent {
+  id: string;
+  date: string;
+  type: 'prescription' | 'lab_report' | 'procedure' | 'intake' | 'followup';
+  title: string;
+  facility: string;
+  summary: string;
+  tags?: string[];
+  isAbnormal?: boolean;
+}
+
 export interface Patient {
   id: string;
   tokenNumber: string;
@@ -187,6 +201,11 @@ export interface Patient {
   clinicalInfo: ClinicalInfo;
   ayushAssessment?: AyushAssessment;
   documents: MedicalDocument[];
+  timelineEvents?: TimelineEvent[];
+  missingInformation?: string[];
+  redFlagReason?: string;
+  redFlags?: string[];
+  inputModality?: 'voice' | 'touch';
   fhirBundle?: FhirResourceBundle;
   conversation: Message[];
   doctorReviewed?: boolean;

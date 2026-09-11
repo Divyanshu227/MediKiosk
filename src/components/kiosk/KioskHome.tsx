@@ -1,142 +1,263 @@
 import React, { useEffect } from 'react';
 import { 
-  ArrowRight, 
   Mic, 
-  Clock, 
-  Stethoscope, 
+  Hand, 
+  ArrowRight, 
+  Sliders, 
+  Volume2, 
+  VolumeX, 
+  Check, 
   ShieldCheck, 
-  Languages, 
-  UserCheck, 
-  HelpCircle 
+  Activity,
+  Globe
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { SUPPORTED_LANGUAGES } from '../../data/mockData';
+import { LanguageCode } from '../../types';
 
 export const KioskHome: React.FC = () => {
   const { 
-    setCurrentScreen, 
-    resetPatientFlow, 
-    setIsHelpModalOpen, 
+    currentLanguage, 
+    setCurrentLanguage, 
+    getLanguageDetails,
+    inputModality,
+    setInputModality,
+    accessibility,
+    updateAccessibility,
+    setCurrentScreen,
+    resetPatientFlow,
     speakText,
-    currentLanguage,
-    getLanguageDetails
+    isSpeaking,
+    stopSpeaking
   } = useApp();
 
-  const lang = getLanguageDetails(currentLanguage);
+  const selectedLang = getLanguageDetails(currentLanguage);
 
   useEffect(() => {
     const greetings: Record<string, string> = {
-      hi: 'मेडीकियोस्क में आपका स्वागत है। परामर्श शुरू करने के लिए स्टार्ट बटन दबाएं।',
-      en: 'Welcome to MediKiosk. Tap Start New Intake to begin your clinical check-in.',
-      pa: 'ਮੈਡੀਕਿਓਸਕ ਵਿੱਚ ਤੁਹਾਡਾ ਸਵਾਗਤ ਹੈ। ਆਪਣਾ ਚੈੱਕ-ਇਨ ਸ਼ੁਰੂ ਕਰਨ ਲਈ ਨਵਾਂ ਇਨਟੇਕ ਸ਼ੁਰੂ ਕਰੋ ਬਟਨ ਦਬਾਓ।',
-      kn: 'ಮೆಡಿಕಿಯೋಸ್ಕ್‌ಗೆ ಸುಸ್ವಾಗತ. ನಿಮ್ಮ ತಪಾಸಣೆಯನ್ನು ಪ್ರಾರಂಭಿಸಲು ಹೊಸ ಇನ್‌ಟೇಕ್ ಪ್ರಾರಂಭಿಸಿ ಬಟನ್ ಒತ್ತಿರಿ.',
-      ml: 'മെഡികിയോസ്കിലേക്ക് സ്വാഗതം. നിങ്ങളുടെ പരിശോധന ആരംഭിക്കാൻ പുതിയ ഇൻടേക്ക് ആരംഭിക്കുക ബട്ടൺ അമർത്തുക.',
-      bn: 'মেডিকিয়স্কে আপনাকে স্বাগতম। আপনার পরামর্শ শুরু করতে স্টার্ট বোতাম টিপুন।',
-      te: 'మెడికియోస్క్‌కు స్వాగతం. మీ చెక్-ఇన్ ప్రారంభించడానికి కొత్త ఇన్‌టేక్ ప్రారంభించండి బటన్‌ను నొక్కండి.',
-      ta: 'மெடிகியோஸ்க்கிற்கு வருக. உங்கள் பரிசோதனையைத் தொடங்க புதிய உட்கொள்ளலைத் தொடங்குங்கள் பொத்தானை அழுத்தவும்.',
-      mr: 'मेडीकियोस्कमध्ये आपले स्वागत आहे. तुमचा तपास सुरू करण्यासाठी नवीन इनटेक सुरू करा बटण दाबा.',
-      gu: 'મેડીકિયોસ્કમાં આપનું સ્વાગત છે. તમારી તપાસ શરૂ કરવા માટે નવું ઇનટેક શરૂ કરો બટન દબાવો.'
+      hi: 'मेडीकियोस्क में आपका स्वागत है। कृपया अपनी भाषा और तरीका चुनें।',
+      en: 'Welcome to MediKiosk. Please choose your language and preferred mode.',
+      bn: 'মেডিকিয়স্কে আপনাকে স্বাগতম। অনুগ্রহ করে আপনার ভাষা নির্বাচন করুন।',
+      te: 'మెడికియోస్క్‌కు స్వాగతం. దయచేసి మీ భాషను ఎంచుకోండి.',
+      mr: 'मेडीकियोस्कमध्ये आपले स्वागत आहे. कृपया तुमची भाषा निवडा.',
+      ta: 'மெடிகியோஸ்க்கிற்கு வருக. உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்.',
+      gu: 'મેડીકિયોસ્કમાં આપનું સ્વાગત છે. કૃપા કરીને તમારી ભાષા પસંદ કરો.',
+      kn: 'ಮೆಡಿಕಿಯೋಸ್ಕ್‌ಗೆ ಸುಸ್ವಾಗತ. ದಯವಿಟ್ಟು ನಿಮ್ಮ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.',
+      ml: 'മെഡികിയോസ്കിലേക്ക് സ്വാഗതം. നിങ്ങളുടെ ഭാഷ തിരഞ്ഞെടുക്കുക.',
+      pa: 'ਮੈਡੀਕਿਓਸਕ ਵਿੱਚ ਤੁਹਾਡਾ ਸਵਾਗਤ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੀ ਬੋਲੀ ਚੁਣੋ।'
     };
-    const greeting = greetings[lang.code] || greetings.en;
-    speakText(greeting, lang.code);
-  }, [lang.code]);
+    const greeting = greetings[currentLanguage] || greetings.en;
+    if (accessibility.voiceGuidance) {
+      speakText(greeting, currentLanguage);
+    }
+  }, [currentLanguage]);
 
-  const handleStart = () => {
+  const handleProceed = (mode?: 'voice' | 'touch') => {
+    if (mode) {
+      setInputModality(mode);
+    }
     resetPatientFlow();
     setCurrentScreen('patient-id');
   };
 
-  const handleReturning = () => {
-    setCurrentScreen('patient-id');
-  };
-
   return (
-    <div className="flex-1 flex flex-col justify-center items-center py-6 sm:py-10 px-4 sm:px-6 max-w-4xl mx-auto w-full animate-fadeIn">
+    <div className="flex-1 flex flex-col justify-center items-center py-4 sm:py-8 px-3 sm:px-6 max-w-4xl mx-auto w-full animate-fadeIn">
       
-      <div className="w-full bg-white border border-slate-200 rounded-xl shadow-sm p-6 sm:p-8 mb-6">
+      {/* Main Kiosk Card */}
+      <div className="w-full bg-white border border-slate-200 rounded-2xl shadow-sm p-4 sm:p-8 mb-4 sm:mb-6">
         
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
-          <div>
-            <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded bg-slate-100 text-slate-700 text-xs font-medium mb-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-teal-600"></span>
-              <span>Self-Service OPD Terminal</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-              Patient Check-in & Symptom Intake
-            </h1>
-            <p className="mt-1 text-sm text-slate-600">
-              Tell the kiosk your symptoms in your language, and scan old records — before you see the doctor.
-            </p>
+        {/* Header Branding */}
+        <div className="text-center pb-5 sm:pb-6 border-b border-slate-100">
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-semibold mb-2 sm:mb-3">
+            <Activity className="w-3.5 h-3.5 text-teal-600 animate-pulse" />
+            <span>AI-Assisted Self-Service OPD Terminal</span>
           </div>
 
-          <button
-            onClick={() => setIsHelpModalOpen(true)}
-            className="px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 font-medium text-xs border border-amber-200 transition-colors flex items-center space-x-1.5 shrink-0"
-          >
-            <HelpCircle className="w-3.5 h-3.5 text-amber-700" />
-            <span>Need Help? / सहायता</span>
-          </button>
+          <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+            MediKiosk
+          </h1>
+          <p className="mt-1.5 sm:mt-2 text-sm sm:text-lg text-slate-600 font-medium max-w-xl mx-auto">
+            “Your medical history, ready before your consultation.”
+          </p>
+          <p className="text-[11px] sm:text-xs text-slate-400 mt-1">
+            परामर्श से पहले आपका मेडिकल इतिहास तैयार करें • 10 Indian Regional Languages
+          </p>
         </div>
 
-        <div className="py-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <button
-            id="btn-start-consultation"
-            onClick={handleStart}
-            className="w-full p-5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-left transition-colors shadow-sm flex flex-col justify-between cursor-pointer group"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-                <Mic className="w-5 h-5" />
-              </div>
-              <ArrowRight className="w-5 h-5 text-teal-200 group-hover:translate-x-1 transition-transform" />
-            </div>
-            <div>
-              <div className="text-lg font-bold">Start New Intake</div>
-              <p className="text-xs text-teal-100 mt-0.5">
-                Speak in your language — or type if you prefer
-              </p>
-            </div>
-          </button>
+        {/* Step 1: Select Language */}
+        <div className="py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-3">
+            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center space-x-1.5">
+              <Globe className="w-4 h-4 text-teal-700" />
+              <span>1. Select Language / अपनी भाषा चुनें</span>
+            </label>
+            <span className="text-xs font-semibold text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-md border border-teal-100 w-fit">
+              Selected: {selectedLang.nativeName} ({selectedLang.name})
+            </span>
+          </div>
 
-          <button
-            onClick={handleReturning}
-            className="w-full p-5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-900 text-left border border-slate-200 transition-colors shadow-sm flex flex-col justify-between cursor-pointer group"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-lg bg-slate-200 text-slate-700 flex items-center justify-center">
-                <UserCheck className="w-5 h-5 text-teal-700" />
-              </div>
-              <ArrowRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
-            </div>
-            <div>
-              <div className="text-lg font-bold">Returning Patient Check-in</div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Use your hospital Patient ID to retrieve existing records
-              </p>
-            </div>
-          </button>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-2.5">
+            {SUPPORTED_LANGUAGES.map((lang) => {
+              const isSelected = currentLanguage === lang.code;
+              return (
+                <button
+                  key={lang.code}
+                  onClick={() => setCurrentLanguage(lang.code as LanguageCode)}
+                  className={`p-3 rounded-xl border text-left transition-all relative flex flex-col justify-between ${
+                    isSelected
+                      ? 'border-teal-700 bg-teal-50/80 shadow-xs ring-1 ring-teal-700'
+                      : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-lg">{lang.flag}</span>
+                    {isSelected && (
+                      <span className="w-4 h-4 rounded-full bg-teal-700 text-white flex items-center justify-center">
+                        <Check className="w-2.5 h-2.5 stroke-[3]" />
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold text-slate-900 leading-tight">
+                      {lang.nativeName}
+                    </div>
+                    <div className="text-[11px] text-slate-500 font-normal">
+                      {lang.name}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        <div className="pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-600">
-          <div className="flex items-center space-x-2.5 p-2 rounded-lg bg-slate-50">
-            <Languages className="w-4 h-4 text-teal-700 shrink-0" />
-            <span>10 Indian regional languages</span>
+        {/* Step 2: Choose Mode & Start */}
+        <div className="py-4 border-t border-slate-100">
+          <div className="mb-3">
+            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+              2. Choose How to Answer / तरीका चुनें
+            </label>
           </div>
-          <div className="flex items-center space-x-2.5 p-2 rounded-lg bg-slate-50">
-            <Clock className="w-4 h-4 text-teal-700 shrink-0" />
-            <span>Doctor reviews your summary in under 2 mins</span>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            {/* Speak Mode */}
+            <button
+              onClick={() => handleProceed('voice')}
+              className={`p-4 sm:p-5 rounded-xl text-left transition-all border shadow-sm flex flex-col justify-between group cursor-pointer ${
+                inputModality === 'voice'
+                  ? 'bg-teal-700 hover:bg-teal-800 text-white border-teal-800'
+                  : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2 sm:mb-3">
+                <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center ${
+                  inputModality === 'voice' ? 'bg-white/15 text-white' : 'bg-teal-50 text-teal-700'
+                }`}>
+                  <Mic className="w-5 h-5" />
+                </div>
+                <ArrowRight className={`w-5 h-5 group-hover:translate-x-1 transition-transform ${
+                  inputModality === 'voice' ? 'text-teal-200' : 'text-slate-400'
+                }`} />
+              </div>
+              <div>
+                <div className="text-base sm:text-lg font-bold">
+                  Speak in Native Language
+                </div>
+                <p className={`text-xs mt-0.5 font-medium ${
+                  inputModality === 'voice' ? 'text-teal-100' : 'text-slate-500'
+                }`}>
+                  बोलकर बताएं • Voice Intake ({selectedLang.name})
+                </p>
+              </div>
+            </button>
+
+            {/* Touch Mode */}
+            <button
+              onClick={() => handleProceed('touch')}
+              className={`p-4 sm:p-5 rounded-xl text-left transition-all border shadow-sm flex flex-col justify-between group cursor-pointer ${
+                inputModality === 'touch'
+                  ? 'bg-teal-700 hover:bg-teal-800 text-white border-teal-800'
+                  : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2 sm:mb-3">
+                <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center ${
+                  inputModality === 'touch' ? 'bg-white/15 text-white' : 'bg-slate-100 text-slate-700'
+                }`}>
+                  <Hand className="w-5 h-5" />
+                </div>
+                <ArrowRight className={`w-5 h-5 group-hover:translate-x-1 transition-transform ${
+                  inputModality === 'touch' ? 'text-teal-200' : 'text-slate-400'
+                }`} />
+              </div>
+              <div>
+                <div className="text-base sm:text-lg font-bold">
+                  Use Touch Screen
+                </div>
+                <p className={`text-xs mt-0.5 font-medium ${
+                  inputModality === 'touch' ? 'text-teal-100' : 'text-slate-500'
+                }`}>
+                  स्क्रीन छूकर चुनें • Guided Touch Interface
+                </p>
+              </div>
+            </button>
           </div>
-          <div className="flex items-center space-x-2.5 p-2 rounded-lg bg-slate-50">
-            <Stethoscope className="w-4 h-4 text-teal-700 shrink-0" />
-            <span>Direct summary routing to doctor</span>
+        </div>
+
+        {/* Quick Accessibility Bar */}
+        <div className="mt-3 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl">
+          <div className="flex items-center space-x-1.5 font-semibold text-slate-700 text-[11px]">
+            <Sliders className="w-3.5 h-3.5 text-slate-500" />
+            <span>Accessibility:</span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-1.5">
+            <button
+              onClick={() => updateAccessibility({ largeText: !accessibility.largeText })}
+              className={`px-2 py-0.5 rounded text-[11px] font-medium border transition-colors ${
+                accessibility.largeText
+                  ? 'bg-teal-700 text-white border-teal-700'
+                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+              }`}
+            >
+              Large Text {accessibility.largeText ? '✓' : ''}
+            </button>
+
+            <button
+              onClick={() => updateAccessibility({ highContrast: !accessibility.highContrast })}
+              className={`px-2 py-0.5 rounded text-[11px] font-medium border transition-colors ${
+                accessibility.highContrast
+                  ? 'bg-slate-900 text-white border-slate-900'
+                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+              }`}
+            >
+              High Contrast {accessibility.highContrast ? '✓' : ''}
+            </button>
+
+            <button
+              onClick={() => {
+                if (isSpeaking) stopSpeaking();
+                updateAccessibility({ voiceGuidance: !accessibility.voiceGuidance });
+              }}
+              className={`px-2 py-0.5 rounded text-[11px] font-medium border transition-colors flex items-center space-x-1 ${
+                accessibility.voiceGuidance
+                  ? 'bg-teal-700 text-white border-teal-700'
+                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+              }`}
+            >
+              {accessibility.voiceGuidance ? <Volume2 className="w-3 h-3" /> : <VolumeX className="w-3 h-3" />}
+              <span>Voice Readout {accessibility.voiceGuidance ? 'ON' : 'OFF'}</span>
+            </button>
           </div>
         </div>
 
       </div>
 
-      <div className="flex items-center space-x-2 text-xs text-slate-500 max-w-lg text-center">
-        <ShieldCheck className="w-4 h-4 text-teal-700 shrink-0" />
+      {/* Safety & Non-Diagnostic Footer Disclaimer */}
+      <div className="flex items-center space-x-1.5 text-[11px] text-slate-500 text-center">
+        <ShieldCheck className="w-3.5 h-3.5 text-teal-700 shrink-0" />
         <p>
-          MediKiosk assists with administrative and clinical intake. A qualified physician evaluates all findings.
+          Non-diagnostic history intake • Doctor validates and makes all clinical decisions.
         </p>
       </div>
 

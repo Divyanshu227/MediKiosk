@@ -43,7 +43,7 @@ export const ConsentScreen: React.FC = () => {
 
   const handleStart = () => {
     if (allAgreed) {
-      setCurrentScreen('voice-intake');
+      setCurrentScreen('ai-conversation');
     }
   };
 
@@ -59,8 +59,8 @@ export const ConsentScreen: React.FC = () => {
           <span>Back</span>
         </button>
 
-        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-          Step 1 of 4 • DPDP Act 2023 Consent
+        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2.5 py-1 rounded">
+          Step 3 of 9 • Clinical Consent
         </span>
       </div>
 
@@ -70,13 +70,13 @@ export const ConsentScreen: React.FC = () => {
           <div>
             <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded bg-teal-50 text-teal-800 text-xs font-medium border border-teal-200 mb-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-teal-700" />
-              <span>DPDP Act 2023 & ABDM Consent Architecture</span>
+              <span>Ethical AI & Clinical Data Governance</span>
             </div>
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-              Patient Data Privacy & Clinical Consent
+              Patient Consent & Intake Authorization
             </h1>
             <p className="mt-0.5 text-xs text-slate-600">
-              Please review the granular permissions before starting the voice-assisted intake session.
+              Clear, transparent agreement before your history is captured.
             </p>
           </div>
 
@@ -89,16 +89,16 @@ export const ConsentScreen: React.FC = () => {
           </button>
         </div>
 
-        {/* 3 Privacy Pillars */}
+        {/* 3 Core Trust Pillars */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           
           <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
             <div className="w-7 h-7 rounded-md bg-teal-100 text-teal-800 flex items-center justify-center">
               <Lock className="w-3.5 h-3.5" />
             </div>
-            <h3 className="text-xs font-bold text-slate-900">Encrypted Processing</h3>
+            <h3 className="text-xs font-bold text-slate-900">Why Data is Collected</h3>
             <p className="text-[11px] text-slate-600 leading-relaxed">
-              Voice and OCR text are processed securely in a sandboxed session and purged after doctor submission.
+              Your health history is captured to prepare a structured briefing for the attending doctor before you enter the consultation room.
             </p>
           </div>
 
@@ -106,9 +106,9 @@ export const ConsentScreen: React.FC = () => {
             <div className="w-7 h-7 rounded-md bg-indigo-100 text-indigo-800 flex items-center justify-center">
               <Mic className="w-3.5 h-3.5" />
             </div>
-            <h3 className="text-xs font-bold text-slate-900">Voice & Speech Transcription</h3>
+            <h3 className="text-xs font-bold text-slate-900">How AI is Used</h3>
             <p className="text-[11px] text-slate-600 leading-relaxed">
-              Your spoken answers in {lang.nativeName} are transcribed into clinical notes for the doctor to review.
+              AI acts solely as a natural speech transcription & history-taking structuring assistant. <strong>The AI does not diagnose.</strong>
             </p>
           </div>
 
@@ -116,21 +116,21 @@ export const ConsentScreen: React.FC = () => {
             <div className="w-7 h-7 rounded-md bg-emerald-100 text-emerald-800 flex items-center justify-center">
               <Stethoscope className="w-3.5 h-3.5" />
             </div>
-            <h3 className="text-xs font-bold text-slate-900">Physician-in-the-Loop</h3>
+            <h3 className="text-xs font-bold text-slate-900">Doctor in Control</h3>
             <p className="text-[11px] text-slate-600 leading-relaxed">
-              The AI drafts clinical intake only. Your attending physician verifies all notes and makes treatment decisions.
+              Your licensed doctor reviews, edits, and validates every finding, retaining 100% authority for all medical decisions.
             </p>
           </div>
 
         </div>
 
-        {/* Granular Checkboxes */}
+        {/* Clear Checkboxes */}
         <div className="space-y-2.5 pt-1">
           <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-            What you are authorizing:
+            Please confirm your consent:
           </p>
 
-          {/* 1. Voice Capture */}
+          {/* 1. Voice & Speech */}
           <div 
             onClick={() => setConsentVoice(!consentVoice)}
             className={`p-3 rounded-lg border transition-all cursor-pointer flex items-start space-x-3 ${
@@ -142,10 +142,10 @@ export const ConsentScreen: React.FC = () => {
             </div>
             <div>
               <label className="text-xs font-bold text-slate-900 cursor-pointer block">
-                1. Voice & Speech Recognition Consent (आवाज रिकॉर्डिंग एवं रूपांतरण)
+                1. Voice & Speech Intake (आवाज रूपांतरण)
               </label>
               <p className="text-[11px] text-slate-600">
-                Allow the kiosk to record and transcribe what you say in {lang.name} for clinical history intake.
+                Transcribes your statements in {lang.name} to prepare a structured narrative for your doctor.
               </p>
             </div>
           </div>
@@ -162,15 +162,15 @@ export const ConsentScreen: React.FC = () => {
             </div>
             <div>
               <label className="text-xs font-bold text-slate-900 cursor-pointer block">
-                2. Medical Document Digitization & OCR (दस्तावेज एवं लैब जांच स्कैनिंग)
+                2. Document Digitization (दस्तावेज स्कैनिंग)
               </label>
               <p className="text-[11px] text-slate-600">
-                Authorize optical character recognition to extract lab values and prescriptions from scanned documents.
+                Scans past prescriptions and lab reports to organize them on your timeline.
               </p>
             </div>
           </div>
 
-          {/* 3. ABDM Health Locker */}
+          {/* 3. Patient Review Right */}
           <div 
             onClick={() => setConsentAbha(!consentAbha)}
             className={`p-3 rounded-lg border transition-all cursor-pointer flex items-start space-x-3 ${
@@ -182,33 +182,42 @@ export const ConsentScreen: React.FC = () => {
             </div>
             <div>
               <label className="text-xs font-bold text-slate-900 cursor-pointer block">
-                3. ABDM Health Information Exchange (ABHA लिंक)
+                3. Review & Verification (समीक्षा का अधिकार)
               </label>
               <p className="text-[11px] text-slate-600">
-                Link generated OPD consultation summary to my ABHA Health Account via FHIR standard.
+                You can review and confirm all details before they are transmitted to the consultation room.
               </p>
             </div>
           </div>
 
         </div>
 
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-          <span className="text-[11px] text-slate-500">
-            You can revoke or modify your consent at any time with hospital reception.
+        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+          <span className="text-[11px] text-slate-500 max-w-sm">
+            All data processed in accordance with the Digital Personal Data Protection (DPDP) Act 2023.
           </span>
 
-          <button
-            onClick={handleStart}
-            disabled={!allAgreed}
-            className={`px-6 py-2.5 rounded-lg font-semibold text-xs shadow-sm transition-all flex items-center space-x-1.5 ${
-              allAgreed 
-                ? 'bg-teal-700 hover:bg-teal-800 text-white cursor-pointer' 
-                : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
-            }`}
-          >
-            <span>Proceed to Voice Intake / शुरुआत करें</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={navigateBack}
+              className="px-4 py-2.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 font-medium text-xs transition-colors"
+            >
+              Back
+            </button>
+
+            <button
+              onClick={handleStart}
+              disabled={!allAgreed}
+              className={`px-6 py-2.5 rounded-lg font-bold text-xs shadow-sm transition-all flex items-center space-x-1.5 ${
+                allAgreed 
+                  ? 'bg-teal-700 hover:bg-teal-800 text-white cursor-pointer' 
+                  : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
+              }`}
+            >
+              <span>Give Consent & Continue</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
       </div>

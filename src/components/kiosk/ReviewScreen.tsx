@@ -52,19 +52,19 @@ export const ReviewScreen: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col justify-center max-w-4xl mx-auto w-full px-4 sm:px-6 py-6 animate-fadeIn">
+    <div className="flex-1 flex flex-col justify-center max-w-4xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-6 animate-fadeIn">
       
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <button
-          onClick={() => setCurrentScreen('document-scanner')}
-          className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-medium text-xs transition-colors shadow-sm"
+          onClick={() => setCurrentScreen('timeline')}
+          className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-medium text-xs transition-colors shadow-2xs"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to Document Scanner</span>
+          <span>Back to Timeline</span>
         </button>
 
-        <span className="text-xs font-semibold uppercase tracking-wider bg-teal-50 text-teal-800 border border-teal-200 px-2.5 py-0.5 rounded">
-          Step 4 of 4 • Final Patient Verification
+        <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-teal-50 text-teal-900 border border-teal-200 px-2.5 py-0.5 rounded">
+          Step 8 of 9 • Patient Intake Review
         </span>
       </div>
 
@@ -75,7 +75,7 @@ export const ReviewScreen: React.FC = () => {
           <div>
             <div className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded bg-teal-50 text-teal-800 text-xs font-medium border border-teal-200 mb-1">
               <FileSpreadsheet className="w-3.5 h-3.5 text-teal-700" />
-              <span>Full Intake & Document Synthesis</span>
+              <span>Intake & Document Synthesis</span>
             </div>
             <h1 className="text-xl font-bold text-slate-900 tracking-tight">
               Review Recorded Clinical History
@@ -277,12 +277,12 @@ export const ReviewScreen: React.FC = () => {
         </div>
 
         {/* Consent & ABDM Sync Callout */}
-        <div className="p-3.5 rounded-xl bg-teal-50 border border-teal-200 flex items-start space-x-2.5 text-xs text-teal-950">
+        <div className="p-3 rounded-xl bg-teal-50 border border-teal-200 flex items-start space-x-2.5 text-xs text-teal-950">
           <ShieldCheck className="w-4 h-4 text-teal-700 shrink-0 mt-0.5" />
           <div>
-            <p className="font-bold text-xs">ABDM & DPDP Act 2023 Digital Clinical Summary</p>
+            <p className="font-bold text-xs">ABDM Digital Intake Summary</p>
             <p className="text-[11px] text-teal-800 mt-0.5">
-              This structured record will be sent to the doctor's queue before you walk in.
+              This structured record will sync to the doctor's workstation before your consult.
             </p>
           </div>
         </div>
@@ -299,9 +299,9 @@ export const ReviewScreen: React.FC = () => {
 
           <button
             onClick={handleGenerateSummary}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-semibold text-xs shadow-sm transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center space-x-2 cursor-pointer"
           >
-            <span>Generate Official OPD Token & Summary</span>
+            <span>Generate Clinical Summary</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

@@ -3,6 +3,7 @@ import {
   Mic, 
   Volume2, 
   ArrowRight, 
+  ArrowLeft,
   FileCheck2, 
   Activity, 
   Pill, 
@@ -10,7 +11,14 @@ import {
   Bot,
   Camera,
   Leaf,
-  Stethoscope
+  Stethoscope,
+  RotateCcw,
+  AlertTriangle,
+  SkipForward,
+  Keyboard,
+  ShieldCheck,
+  CheckCircle2,
+  XCircle
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { DEMO_ALLOPATHY_FLOW_STEPS, DEMO_AYUSH_FLOW_STEPS } from '../../data/mockData';
@@ -24,9 +32,12 @@ export const AIConversationScreen: React.FC = () => {
     updateActiveClinicalInfo,
     updateAyushAssessment,
     setCurrentScreen,
+    navigateBack,
     speakText,
     triggerUrgentAlert,
-    clinicalDepartment 
+    triggerRedFlagScreen,
+    clinicalDepartment,
+    inputModality 
   } = useApp();
 
   const flowSteps = clinicalDepartment === 'ayush' ? DEMO_AYUSH_FLOW_STEPS : DEMO_ALLOPATHY_FLOW_STEPS;
@@ -209,7 +220,7 @@ export const AIConversationScreen: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start flex-1 mb-2">
         
         {/* Left Side: Adaptive Dialogue Stream (7 cols) */}
-        <div className="lg:col-span-7 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-[560px] overflow-hidden">
+        <div className="lg:col-span-7 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-[460px] sm:h-[560px] overflow-hidden">
           
           <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs font-medium text-slate-700">
             <div className="flex items-center space-x-1.5">
@@ -249,7 +260,7 @@ export const AIConversationScreen: React.FC = () => {
                       <p className={`text-[11px] mt-1 pt-1 border-t italic ${
                         isAi ? 'text-slate-500 border-slate-200' : 'text-teal-100 border-teal-600'
                       }`}>
-                        English: "{msg.translation}"
+                        "{msg.translation}"
                       </p>
                     )}
 
@@ -319,14 +330,28 @@ export const AIConversationScreen: React.FC = () => {
               </div>
             )}
 
-            {/* Voice & Continue Action Bar */}
-            <div className="flex items-center gap-2 pt-1">
+            {/* Dual Voice & Navigation Controls */}
+            <div className="flex flex-wrap items-center gap-2 pt-1">
               <button
+                type="button"
+                onClick={() => {
+                  const q = currentStep.aiQuestion[currentLanguage in currentStep.aiQuestion ? currentLanguage as keyof typeof currentStep.aiQuestion : 'hi'] || currentStep.aiQuestion.hi;
+                  speakText(q, currentLanguage);
+                }}
+                className="px-3 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center space-x-1.5 transition-colors shadow-2xs"
+                title="Repeat AI Question Audio"
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-teal-700" />
+                <span className="hidden sm:inline">Repeat</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={handleSimulateSpeechResponse}
                 disabled={isListening || isProcessing}
-                className={`flex-1 py-2 px-3.5 rounded-lg font-medium text-xs shadow-sm transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
+                className={`flex-1 py-2 px-3.5 rounded-lg font-bold text-xs shadow-sm transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
                   isListening
-                    ? 'bg-red-600 text-white'
+                    ? 'bg-red-600 text-white animate-pulse'
                     : isProcessing
                     ? 'bg-teal-800 text-white'
                     : 'bg-teal-700 hover:bg-teal-800 text-white'
@@ -337,129 +362,179 @@ export const AIConversationScreen: React.FC = () => {
                   {isListening 
                     ? 'Listening... (Speak Now)' 
                     : isProcessing 
-                    ? 'Processing...' 
-                    : `Speak Answer (${lang.name})`}
+                    ? 'Transcribing Speech...' 
+                    : `Speak in ${lang.name}`}
                 </span>
               </button>
 
               <button
-                onClick={() => setCurrentScreen('document-scanner')}
-                className="px-3.5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs shadow-sm transition-colors flex items-center space-x-1 shrink-0"
+                type="button"
+                onClick={() => {
+                  if (currentStepIndex < flowSteps.length - 1) {
+                    setCurrentStepIndex(prev => prev + 1);
+                  } else {
+                    setCurrentScreen('document-scanner');
+                  }
+                }}
+                className="px-3 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-medium flex items-center space-x-1 transition-colors"
+                title="Skip to next clinical section"
               >
-                <Camera className="w-3.5 h-3.5 text-teal-400" />
-                <span>Scan Docs (Step 3)</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <SkipForward className="w-3.5 h-3.5 text-slate-400" />
+                <span className="hidden sm:inline">Skip</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => triggerRedFlagScreen('Severe acute retrosternal chest pain with left arm radiation (ACS Suspicion)')}
+                className="px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold flex items-center space-x-1.5 transition-colors shrink-0"
+                title="Trigger Urgent Clinical Safety Demo"
+              >
+                <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
+                <span>Demo Red-Flag</span>
               </button>
             </div>
 
-            <form onSubmit={handleManualSubmit} className="flex gap-2">
-              <input
-                type="text"
-                value={manualInput}
-                onChange={(e) => setManualInput(e.target.value)}
-                placeholder="Or type custom answer in English/Hindi..."
-                className="flex-1 px-2.5 py-1 text-xs rounded-md border border-slate-300 focus:outline-none focus:border-teal-700 text-slate-800 bg-white"
-              />
+            {/* Quick Text Fallback Form */}
+            <form onSubmit={handleManualSubmit} className="flex gap-2 pt-1">
+              <div className="relative flex-1">
+                <Keyboard className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={manualInput}
+                  onChange={(e) => setManualInput(e.target.value)}
+                  placeholder={`Or type answer in ${lang.name} / English...`}
+                  className="w-full pl-8 pr-2.5 py-1.5 text-xs rounded-lg border border-slate-300 focus:outline-none focus:border-teal-700 text-slate-800 bg-white font-medium"
+                />
+              </div>
               <button
                 type="submit"
-                className="px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-md text-xs font-medium transition-colors"
+                className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition-colors shadow-2xs"
               >
-                Send
+                Submit
               </button>
             </form>
           </div>
 
         </div>
 
-        {/* Right Side: Live Clinical Extraction & AYUSH Dashavidha View (5 cols) */}
+        {/* Right Side: Live Clinical Extraction & SOCRATES Ontology View (5 cols) */}
         <div className="lg:col-span-5 bg-white rounded-xl border border-slate-200 p-4 shadow-sm space-y-3">
           
           <div className="flex items-center justify-between pb-2.5 border-b border-slate-200">
             <div className="flex items-center space-x-1.5">
               <FileCheck2 className="w-4 h-4 text-teal-700" />
               <h3 className="font-bold text-slate-900 text-xs uppercase tracking-wider">
-                {clinicalDepartment === 'ayush' ? 'Dashavidha Pariksha Chart' : 'Structured EMR Extraction'}
+                {clinicalDepartment === 'ayush' ? 'AYUSH Intake Summary' : 'Clinical History Summary'}
               </h3>
             </div>
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-teal-50 text-teal-800 border border-teal-200">
-              Updating live
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-teal-50 text-teal-800 border border-teal-200">
+              Live Intake
             </span>
           </div>
 
           <div className="space-y-2 text-xs text-slate-700 max-h-[440px] overflow-y-auto pr-1">
             
-            <div className="p-2 rounded bg-slate-50 border border-slate-200">
-              <span className="font-semibold uppercase tracking-wider text-slate-500 block mb-0.5 text-[10px]">Chief Complaint</span>
-              <p className="text-xs font-bold text-slate-900">{activePatient.clinicalInfo.chiefComplaint || 'Under elicitation'}</p>
+            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+              <span className="font-bold uppercase tracking-wider text-slate-500 block mb-0.5 text-[10px]">
+                Chief Complaint
+              </span>
+              <p className="text-xs font-bold text-slate-900">
+                {activePatient.clinicalInfo.chiefComplaint || 'Awaiting response...'}
+              </p>
             </div>
 
             {clinicalDepartment === 'ayush' && activePatient.ayushAssessment && (
               <div className="p-2.5 rounded-lg bg-amber-50/50 border border-amber-200 space-y-2">
                 <span className="font-bold text-amber-900 text-[11px] block">
-                  Ayurvedic Diagnostic Assessment:
+                  Ayurvedic Assessment:
                 </span>
                 <div className="grid grid-cols-2 gap-2 text-[11px]">
                   <div className="p-1.5 bg-white rounded border border-amber-100">
-                    <span className="text-slate-500 font-semibold block text-[10px]">Agni (Digestive Fire):</span>
+                    <span className="text-slate-500 font-semibold block text-[10px]">Agni:</span>
                     <span className="font-bold text-amber-800">{activePatient.ayushAssessment.agni} Agni</span>
                   </div>
                   <div className="p-1.5 bg-white rounded border border-amber-100">
-                    <span className="text-slate-500 font-semibold block text-[10px]">Koshtha (Bowel):</span>
+                    <span className="text-slate-500 font-semibold block text-[10px]">Koshtha:</span>
                     <span className="font-bold text-amber-800">{activePatient.ayushAssessment.koshtha} Koshtha</span>
                   </div>
                   <div className="p-1.5 bg-white rounded border border-amber-100 col-span-2">
-                    <span className="text-slate-500 font-semibold block text-[10px]">Prakriti & Vikriti:</span>
-                    <span className="font-bold text-slate-900">{activePatient.ayushAssessment.prakriti} ({activePatient.ayushAssessment.vikriti})</span>
+                    <span className="text-slate-500 font-semibold block text-[10px]">Prakriti:</span>
+                    <span className="font-bold text-slate-900">{activePatient.ayushAssessment.prakriti}</span>
                   </div>
                 </div>
               </div>
             )}
 
             <div className="grid grid-cols-2 gap-2">
-              <div className="p-2 rounded bg-slate-50 border border-slate-200">
-                <span className="font-semibold uppercase tracking-wider text-slate-500 block mb-0.5 text-[10px]">Duration</span>
+              <div className="p-2 rounded-lg bg-slate-50 border border-slate-200">
+                <span className="font-bold uppercase tracking-wider text-slate-500 block mb-0.5 text-[10px]">Duration</span>
                 <p className="font-semibold text-slate-900">{activePatient.clinicalInfo.duration || '3 days'}</p>
               </div>
 
-              <div className="p-2 rounded bg-slate-50 border border-slate-200">
-                <span className="font-semibold uppercase tracking-wider text-slate-500 block mb-0.5 text-[10px]">Severity</span>
-                <p className="font-semibold text-amber-800">{activePatient.clinicalInfo.severity || 'Moderate'}</p>
+              <div className="p-2 rounded-lg bg-slate-50 border border-slate-200">
+                <span className="font-bold uppercase tracking-wider text-slate-500 block mb-0.5 text-[10px]">Severity</span>
+                <p className="font-semibold text-amber-800">{activePatient.clinicalInfo.severity || 'Moderate (101.4°F)'}</p>
               </div>
             </div>
 
-            <div className="p-2 rounded bg-slate-50 border border-slate-200">
-              <span className="font-semibold uppercase tracking-wider text-slate-500 block mb-1 text-[10px]">Associated Symptoms</span>
+            {/* Positive Symptoms */}
+            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+              <span className="font-bold uppercase tracking-wider text-slate-500 block mb-1 text-[10px] flex items-center space-x-1">
+                <CheckCircle2 className="w-3 h-3 text-teal-700" />
+                <span>Reported Symptoms (+)</span>
+              </span>
               <div className="flex flex-wrap gap-1">
                 {activePatient.clinicalInfo.associatedSymptoms.map((symp, i) => (
-                  <span key={i} className="px-1.5 py-0.2 rounded bg-teal-50 text-teal-800 font-medium border border-teal-200 text-[10px]">
+                  <span key={i} className="px-2 py-0.5 rounded bg-teal-50 text-teal-800 font-semibold border border-teal-200 text-[10px]">
                     + {symp}
                   </span>
                 ))}
               </div>
             </div>
 
-            <div className="p-2 rounded bg-slate-50 border border-slate-200 flex items-start space-x-1.5">
-              <Pill className="w-3.5 h-3.5 text-indigo-600 mt-0.5 shrink-0" />
-              <div>
-                <span className="font-semibold uppercase tracking-wider text-slate-500 block mb-0.5 text-[10px]">Medications Taken</span>
-                <p className="font-semibold text-slate-900">{activePatient.clinicalInfo.medicationsTaken.join(', ') || 'None recorded'}</p>
+            {/* Negative Symptoms */}
+            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+              <span className="font-bold uppercase tracking-wider text-slate-500 block mb-1 text-[10px] flex items-center space-x-1">
+                <XCircle className="w-3 h-3 text-slate-500" />
+                <span>Denied Symptoms (✕)</span>
+              </span>
+              <div className="flex flex-wrap gap-1">
+                {(activePatient.clinicalInfo.deniedSymptoms && activePatient.clinicalInfo.deniedSymptoms.length > 0 
+                  ? activePatient.clinicalInfo.deniedSymptoms 
+                  : ['No chest pain', 'No dyspnea', 'No cough', 'No vomiting']
+                ).map((symp, i) => (
+                  <span key={i} className="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium border border-slate-200 text-[10px]">
+                    ✕ {symp}
+                  </span>
+                ))}
               </div>
             </div>
 
-            <div className="p-2 rounded bg-slate-50 border border-slate-200">
-              <span className="font-semibold uppercase tracking-wider text-slate-500 block mb-0.5 text-[10px]">Known Allergies</span>
-              <p className="font-semibold text-slate-700">{activePatient.clinicalInfo.allergies || 'No known allergies'}</p>
+            {/* Medications & Allergies */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 flex items-start space-x-1.5">
+                <Pill className="w-3.5 h-3.5 text-indigo-600 mt-0.5 shrink-0" />
+                <div>
+                  <span className="font-bold uppercase tracking-wider text-slate-500 block mb-0.5 text-[10px]">Medications</span>
+                  <p className="font-semibold text-slate-900 text-[11px]">{activePatient.clinicalInfo.medicationsTaken.join(', ') || 'None recorded'}</p>
+                </div>
+              </div>
+
+              <div className="p-2 rounded-lg bg-slate-50 border border-slate-200">
+                <span className="font-bold uppercase tracking-wider text-slate-500 block mb-0.5 text-[10px]">Allergies</span>
+                <p className="font-semibold text-slate-700 text-[11px]">{activePatient.clinicalInfo.allergies || 'No known allergies'}</p>
+              </div>
             </div>
 
           </div>
 
           <button
             onClick={() => setCurrentScreen('document-scanner')}
-            className="w-full py-2.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-semibold text-xs shadow-sm transition-all flex items-center justify-center space-x-1.5"
+            className="w-full py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center space-x-2"
           >
-            <Camera className="w-3.5 h-3.5" />
-            <span>Proceed to Step 3: Scan Documents</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <Camera className="w-4 h-4" />
+            <span>Proceed to Step 5: Document Scanner</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
 
         </div>
