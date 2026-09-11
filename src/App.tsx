@@ -17,6 +17,9 @@ import { AIConversationScreen } from './components/kiosk/AIConversationScreen';
 import { DocumentScannerScreen } from './components/kiosk/DocumentScannerScreen';
 import { ReviewScreen } from './components/kiosk/ReviewScreen';
 import { ClinicalSummaryScreen } from './components/kiosk/ClinicalSummaryScreen';
+import { TimelineScreen } from './components/kiosk/TimelineScreen';
+import { RedFlagScreen } from './components/kiosk/RedFlagScreen';
+import { ArchitectureModal } from './components/common/ArchitectureModal';
 
 import { DoctorSidebar } from './components/doctor/DoctorSidebar';
 import { DoctorDashboard } from './components/doctor/DoctorDashboard';
@@ -42,10 +45,12 @@ const MainAppContent: React.FC = () => {
 
       <main className="flex-1 flex flex-col">
         {isDoctorMode ? (
-          <div className="flex-1 flex flex-col lg:flex-row">
+          <div className="flex-1 flex flex-col lg:flex-row min-w-0">
             <DoctorSidebar activeTab={doctorActiveTab} setActiveTab={setDoctorActiveTab} />
-            <div className="flex-1 flex flex-col bg-slate-50/50">
-              {currentScreen === 'doctor-dashboard' && <DoctorDashboard />}
+            <div className="flex-1 flex flex-col bg-slate-50/50 min-w-0">
+              {currentScreen === 'doctor-dashboard' && (
+                <DoctorDashboard activeTab={doctorActiveTab} setActiveTab={setDoctorActiveTab} />
+              )}
               {currentScreen === 'doctor-patient-summary' && <DoctorPatientSummary />}
               {currentScreen === 'doctor-conversation' && <DoctorConversationView />}
             </div>
@@ -59,6 +64,8 @@ const MainAppContent: React.FC = () => {
             {currentScreen === 'voice-intake' && <VoiceIntakeScreen />}
             {currentScreen === 'ai-conversation' && <AIConversationScreen />}
             {currentScreen === 'document-scanner' && <DocumentScannerScreen />}
+            {currentScreen === 'timeline' && <TimelineScreen />}
+            {currentScreen === 'red-flag' && <RedFlagScreen />}
             {currentScreen === 'review' && <ReviewScreen />}
             {currentScreen === 'clinical-summary' && <ClinicalSummaryScreen />}
           </div>
@@ -70,6 +77,7 @@ const MainAppContent: React.FC = () => {
       <AccessibilityModal />
       <HelpModal />
       <AboutModal />
+      <ArchitectureModal />
       <UrgentAlertModal />
       <DoctorLoginModal />
     </div>
