@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertTriangle, PhoneCall, ShieldAlert, CheckCircle2, Stethoscope, X } from 'lucide-react';
+import { PhoneCall, ShieldAlert, CheckCircle2, Stethoscope } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 export const UrgentAlertModal: React.FC = () => {
@@ -10,60 +10,57 @@ export const UrgentAlertModal: React.FC = () => {
 
   const handleCallStaff = () => {
     setStaffCalled(true);
-    showToast('URGENT: Emergency ER triage team notified for Kiosk #3!');
+    showToast('Emergency triage team notified for Terminal #3.');
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-red-950/70 backdrop-blur-md animate-fadeIn">
-      <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border-4 border-red-500 relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border-2 border-red-500 relative">
         
-        {/* Urgent Badge Header */}
         <div className="flex items-center space-x-3 pb-4 border-b border-red-100">
-          <div className="w-14 h-14 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0 animate-bounce">
-            <ShieldAlert className="w-8 h-8 stroke-[2.5]" />
+          <div className="w-11 h-11 rounded-xl bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+            <ShieldAlert className="w-6 h-6 stroke-[2]" />
           </div>
           <div>
-            <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-red-600 text-white mb-1">
+            <span className="inline-block px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-red-100 text-red-800 border border-red-200 mb-0.5">
               Priority Clinical Safety Alert
             </span>
-            <h2 className="text-xl font-black text-red-900 leading-tight">Urgent Attention Required</h2>
+            <h2 className="text-lg font-bold text-red-950">Immediate Medical Attention Required</h2>
           </div>
         </div>
 
-        {/* Body Content */}
-        <div className="py-6 space-y-4">
+        <div className="py-5 space-y-4">
           
-          <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-900 text-sm">
-            <p className="font-bold text-base mb-1">
-              IMPORTANT: Your symptoms may require urgent medical attention.
+          <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-900 text-xs">
+            <p className="font-bold text-sm mb-1">
+              Your reported symptoms indicate a potential medical emergency.
             </p>
-            <p className="text-xs text-red-700">
-              Reason detected: <span className="font-semibold italic">{urgentReason}</span>
+            <p className="text-red-700">
+              Trigger symptom: <span className="font-semibold">{urgentReason}</span>
             </p>
           </div>
 
-          <p className="text-slate-700 text-sm font-medium">
-            Please seek immediate direct assistance from the hospital triage staff or proceed directly to the Emergency Care desk.
+          <p className="text-slate-700 text-xs leading-relaxed">
+            Please seek direct in-person evaluation immediately at the Emergency / Triage counter.
           </p>
 
-          {/* Action buttons */}
-          <div className="space-y-3 pt-2">
+          <div className="space-y-2.5 pt-1">
             
             {staffCalled ? (
-              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center space-x-3">
-                <CheckCircle2 className="w-6 h-6 text-emerald-600 flex-shrink-0 animate-pulse" />
+              <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center space-x-2.5">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                 <div>
-                  <h4 className="font-bold text-sm">Emergency Staff Alerted!</h4>
-                  <p className="text-xs text-emerald-700">Please remain at the kiosk. An ER triage nurse is arriving immediately.</p>
+                  <h4 className="font-bold text-xs">Triage Staff Alerted</h4>
+                  <p className="text-[11px] text-emerald-700">Please stay at the kiosk. A triage nurse is on the way.</p>
                 </div>
               </div>
             ) : (
               <button
                 onClick={handleCallStaff}
-                className="w-full py-4 px-6 rounded-2xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-black text-base shadow-lg shadow-red-600/30 transition-all flex items-center justify-center space-x-2"
+                className="w-full py-3 px-4 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-sm shadow-sm transition-all flex items-center justify-center space-x-2"
               >
-                <PhoneCall className="w-5 h-5 animate-pulse" />
-                <span>Call Emergency Healthcare Staff Now</span>
+                <PhoneCall className="w-4 h-4" />
+                <span>Call Emergency Triage Staff</span>
               </button>
             )}
 
@@ -73,10 +70,10 @@ export const UrgentAlertModal: React.FC = () => {
                 setStaffCalled(false);
                 setCurrentScreen('doctor-dashboard');
               }}
-              className="w-full py-3 px-6 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm transition-all flex items-center justify-center space-x-2"
+              className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-colors flex items-center justify-center space-x-2"
             >
               <Stethoscope className="w-4 h-4 text-teal-400" />
-              <span>Continue Only with Healthcare Professional (Doctor View)</span>
+              <span>Switch to Doctor View</span>
             </button>
 
             <button
@@ -84,9 +81,9 @@ export const UrgentAlertModal: React.FC = () => {
                 setIsUrgentAlertOpen(false);
                 setStaffCalled(false);
               }}
-              className="w-full py-2.5 px-4 text-slate-500 hover:text-slate-800 text-xs font-semibold transition-colors"
+              className="w-full py-2 px-4 text-slate-500 hover:text-slate-800 text-xs font-medium transition-colors text-center"
             >
-              Dismiss (Return to intake)
+              Dismiss and continue intake
             </button>
 
           </div>
