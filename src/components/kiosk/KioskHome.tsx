@@ -7,9 +7,7 @@ import {
   ShieldCheck, 
   Languages, 
   UserCheck, 
-  Sparkles, 
-  HelpCircle,
-  Volume2
+  HelpCircle 
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
@@ -26,10 +24,9 @@ export const KioskHome: React.FC = () => {
   const lang = getLanguageDetails(currentLanguage);
 
   useEffect(() => {
-    // Speak welcome prompt on load
     const greeting = lang.code === 'hi'
       ? 'मेडीकियोस्क में आपका स्वागत है। परामर्श शुरू करने के लिए स्टार्ट बटन दबाएं।'
-      : 'Welcome to Medikiosk. Tap Start Consultation to begin.';
+      : 'Welcome to MediKiosk. Tap Start Consultation to begin.';
     speakText(greeting, lang.code);
   }, []);
 
@@ -43,99 +40,88 @@ export const KioskHome: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col justify-center items-center py-8 sm:py-12 px-4 sm:px-6 max-w-6xl mx-auto w-full animate-fadeIn">
+    <div className="flex-1 flex flex-col justify-center items-center py-8 sm:py-12 px-4 sm:px-6 max-w-5xl mx-auto w-full animate-fadeIn">
       
-      {/* Hero Badge */}
-      <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-sm font-semibold mb-6 shadow-sm">
-        <Sparkles className="w-4 h-4 text-teal-600" />
-        <span>AI-Powered Multilingual Healthcare Kiosk</span>
+      <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-semibold mb-6">
+        <span className="w-2 h-2 rounded-full bg-teal-600"></span>
+        <span>Hospital Patient Intake • Voice & Touch</span>
       </div>
 
-      {/* Main Title & Subtitle */}
-      <div className="text-center max-w-3xl mb-10">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight">
-          Welcome to <span className="text-teal-600">Medikiosk</span>
+      <div className="text-center max-w-2xl mb-8">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+          Welcome to <span className="text-teal-600">MediKiosk</span>
         </h1>
-        <p className="mt-4 text-lg sm:text-xl text-slate-600 font-medium leading-relaxed max-w-2xl mx-auto">
-          Tell us what you're feeling. We'll help organize your medical history in your native language for the doctor.
+        <p className="mt-3 text-base sm:text-lg text-slate-600 leading-relaxed">
+          Record your symptoms and health details in your preferred language before seeing the doctor.
         </p>
       </div>
 
-      {/* Primary Action Buttons */}
-      <div className="w-full max-w-xl space-y-4 mb-12">
-        
-        {/* HUGE START CONSULTATION BUTTON */}
+      <div className="w-full max-w-lg space-y-3 mb-10">
         <button
           id="btn-start-consultation"
           onClick={handleStart}
-          className="group w-full py-6 px-8 rounded-3xl bg-gradient-to-r from-teal-600 via-teal-500 to-teal-600 hover:from-teal-700 hover:via-teal-600 hover:to-teal-700 text-white font-black text-2xl sm:text-3xl shadow-xl shadow-teal-600/30 hover:shadow-2xl hover:shadow-teal-600/40 transform hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center space-x-4 border-2 border-teal-400/40"
+          className="group w-full py-5 px-6 rounded-2xl bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white font-bold text-xl sm:text-2xl shadow-md transition-all flex items-center justify-center space-x-3 cursor-pointer"
         >
-          <Mic className="w-8 h-8 sm:w-10 sm:h-10 animate-bounce" />
-          <span>START CONSULTATION</span>
-          <ArrowRight className="w-7 h-7 sm:w-8 sm:h-8 group-hover:translate-x-1.5 transition-transform" />
+          <Mic className="w-6 h-6 sm:w-7 sm:h-7" />
+          <span>Start Consultation</span>
+          <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform" />
         </button>
 
-        {/* SECONDARY & ACCESSIBLE BUTTONS */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <button
             onClick={handleReturning}
-            className="py-4 px-6 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-base border-2 border-slate-200 hover:border-slate-300 shadow-sm transition-all flex items-center justify-center space-x-2"
+            className="py-3 px-4 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-semibold text-sm border border-slate-200 shadow-sm transition-colors flex items-center justify-center space-x-2"
           >
-            <UserCheck className="w-5 h-5 text-teal-600" />
-            <span>I'm a Returning Patient</span>
+            <UserCheck className="w-4 h-4 text-teal-600" />
+            <span>Returning Patient Check-in</span>
           </button>
 
           <button
             onClick={() => setIsHelpModalOpen(true)}
-            className="py-4 px-6 rounded-2xl bg-amber-50/80 hover:bg-amber-100 text-amber-900 font-bold text-base border-2 border-amber-200/80 shadow-sm transition-all flex items-center justify-center space-x-2"
+            className="py-3 px-4 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 font-semibold text-sm border border-amber-200 shadow-sm transition-colors flex items-center justify-center space-x-2"
           >
-            <HelpCircle className="w-5 h-5 text-amber-600" />
+            <HelpCircle className="w-4 h-4 text-amber-600" />
             <span>Need Help? / सहायता</span>
           </button>
         </div>
-
       </div>
 
-      {/* Benefit Cards (3 Cards) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl mb-8">
-        
-        <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
-          <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mb-4 font-bold">
-            <Languages className="w-7 h-7" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl mb-8">
+        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+          <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center mb-3">
+            <Languages className="w-5 h-5" />
           </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-2">1. Speak Naturally</h3>
-          <p className="text-slate-600 text-sm leading-relaxed">
-            Describe your symptoms comfortably in Hindi, English, Bengali, Telugu, Tamil, and other regional languages.
+          <h3 className="text-sm font-bold text-slate-900 mb-1">1. Speak in Your Language</h3>
+          <p className="text-slate-600 text-xs leading-relaxed">
+            Support for 10 regional Indian languages including Hindi, Bengali, Telugu, Tamil, and Marathi.
           </p>
         </div>
 
-        <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
-          <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4 font-bold">
-            <Clock className="w-7 h-7" />
+        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+          <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center mb-3">
+            <Clock className="w-5 h-5" />
           </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-2">2. Save Consultation Time</h3>
-          <p className="text-slate-600 text-sm leading-relaxed">
-            Your detailed symptom duration, severity, and medications are cleanly organized before you enter the doctor's room.
+          <h3 className="text-sm font-bold text-slate-900 mb-1">2. Faster Intake</h3>
+          <p className="text-slate-600 text-xs leading-relaxed">
+            Symptom duration, temperature, medications, and allergies are recorded in under 2 minutes.
           </p>
         </div>
 
-        <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
-          <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 font-bold">
-            <Stethoscope className="w-7 h-7" />
+        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3">
+            <Stethoscope className="w-5 h-5" />
           </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-2">3. Doctor Ready</h3>
-          <p className="text-slate-600 text-sm leading-relaxed">
-            A concise, standardized clinical history summary is sent instantly to the clinician for fast, high-quality care.
+          <h3 className="text-sm font-bold text-slate-900 mb-1">3. Doctor-Ready Summary</h3>
+          <p className="text-slate-600 text-xs leading-relaxed">
+            A standardized clinical summary is sent directly to the physician's screen before you enter.
           </p>
         </div>
-
       </div>
 
-      {/* Trust & Safety Disclaimer */}
-      <div className="flex items-center space-x-2 text-xs sm:text-sm text-slate-500 max-w-xl text-center">
-        <ShieldCheck className="w-5 h-5 text-teal-600 flex-shrink-0" />
+      <div className="flex items-center space-x-2 text-xs text-slate-500 max-w-lg text-center">
+        <ShieldCheck className="w-4 h-4 text-teal-600 shrink-0" />
         <p>
-          Medikiosk assists with patient intake. A qualified healthcare professional makes the final clinical decisions.
+          MediKiosk assists with intake. All diagnostic and prescription decisions are made by your physician.
         </p>
       </div>
 
