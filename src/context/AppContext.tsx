@@ -15,6 +15,7 @@ import {
   DoctorUser
 } from '../types';
 import { INITIAL_PATIENTS, SUPPORTED_LANGUAGES, SAMPLE_SCAN_TEMPLATES } from '../data/mockData';
+import { playOnlineTtsAudio, transliterateGurmukhiToDevanagari, stopAllAudio } from '../utils/audioTts';
 
 interface AppContextType {
   currentScreen: ScreenType;
@@ -570,11 +571,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAccessibility(prev => ({ ...prev, ...updates }));
   };
 
-  const speakText = (text: string, langCode?: LanguageCode) => {
+  const speakText = async (text: string, langCode?: LanguageCode) => {
     if (!accessibility.voiceGuidance) return;
-    if ('speechSynthesis' in window) {
+    const code = langCode || currentLanguage;
+    stopAllAudio();
+
+    // Priority 1: High-fidelity native online TTS audio stream for Punjabi and regional languages
+    try {
+      const onlinePlayed = await playOnlineTtsAudio(
+        text, 
+        code, 
+        () => setIsSpeaking(true), 
+        () => setIsSpeaking(false)
+      );
+      if (onlinePlayed) {
+        return;
+      }
+    } catch {
+      // Proceed to Web Speech API fallback
+    }
+
+    // Priority 2: Web Speech API (speechSynthesis)
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
       const code = langCode || currentLanguage;
 
       const localeMap: Record<LanguageCode, string> = {
@@ -604,29 +623,39 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       };
 
       const targetLocale = localeMap[code] || 'hi-IN';
-      utterance.lang = targetLocale;
+      const voices = window.speechSynthesis.getVoices() || [];
 
-      // Select matching voice from browser if available
-      try {
-        const voices = window.speechSynthesis.getVoices();
-        if (voices && voices.length > 0) {
-          const matchKeywords = langNameMap[code] || [code];
-          const matchingVoice = voices.find(v => {
-            const vLang = v.lang.toLowerCase().replace('_', '-');
-            const vName = v.name.toLowerCase();
-            return (
-              vLang === targetLocale.toLowerCase() ||
-              vLang.startsWith(`${code}-`) ||
-              vLang === code ||
-              matchKeywords.some(k => vName.includes(k.toLowerCase()) || vLang.includes(k.toLowerCase()))
-            );
-          });
-          if (matchingVoice) {
-            utterance.voice = matchingVoice;
-          }
-        }
-      } catch {
-        // Continue with default voice
+      // Check if a voice exists for this specific language
+      const matchKeywords = langNameMap[code] || [code];
+      let matchingVoice = voices.find(v => {
+        const vLang = v.lang.toLowerCase().replace('_', '-');
+        const vName = v.name.toLowerCase();
+        return (
+          vLang === targetLocale.toLowerCase() ||
+          vLang.startsWith(`${code}-`) ||
+          vLang === code ||
+          matchKeywords.some(k => vName.includes(k.toLowerCase()) || vLang.includes(k.toLowerCase()))
+        );
+      });
+
+      let textToSpeak = text;
+      let finalLocale = targetLocale;
+
+      // If Punjabi and no native Punjabi voice is installed in browser,
+      // phonetically transliterate Gurmukhi to Devanagari and speak via the standard Hindi voice
+      if (code === 'pa' && !matchingVoice) {
+        textToSpeak = transliterateGurmukhiToDevanagari(text);
+        finalLocale = 'hi-IN';
+        matchingVoice = voices.find(v => 
+          v.lang.toLowerCase().replace('_', '-').startsWith('hi') || 
+          v.name.toLowerCase().includes('hindi')
+        );
+      }
+
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.lang = finalLocale;
+      if (matchingVoice) {
+        utterance.voice = matchingVoice;
       }
 
       utterance.rate = 0.95;
@@ -643,10 +672,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const stopSpeaking = () => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
-    }
+    stopAllAudio();
+    setIsSpeaking(false);
   };
 
   const triggerUrgentAlert = (reason: string) => {

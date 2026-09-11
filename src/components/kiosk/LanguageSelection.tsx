@@ -37,6 +37,7 @@ export const LanguageSelection: React.FC = () => {
   const handleTestMic = () => {
     setIsMicTesting(true);
     setMicTestPassed(false);
+    speakText(selectedLang.greeting, currentLanguage);
     setTimeout(() => {
       setIsMicTesting(false);
       setMicTestPassed(true);
