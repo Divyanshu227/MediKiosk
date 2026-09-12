@@ -1087,7 +1087,7 @@ ABDM Tele-consult / OPD Gateway Certified`;
 
       </div>
 
-      {/* In-Page Zomato-Style Doctor Clinical Precision Feedback */}
+      {/* In-Page Doctor Clinical Precision Evaluation */}
       <InPageFeedbackCard
         type="doctor"
         patientName={patient.name}

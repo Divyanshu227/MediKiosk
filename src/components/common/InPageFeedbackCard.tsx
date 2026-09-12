@@ -4,15 +4,24 @@ import {
   Send, 
   CheckCircle2, 
   Sparkles, 
-  MessageSquare, 
-  Heart, 
-  ThumbsUp, 
   Stethoscope, 
-  Smartphone, 
   ChevronDown, 
   ChevronUp, 
   RotateCcw,
-  BadgeCheck
+  BadgeCheck,
+  Check,
+  Sliders,
+  Clock,
+  ShieldCheck,
+  FileSpreadsheet,
+  Layers,
+  Volume2,
+  Mic,
+  QrCode,
+  Touchpad,
+  Type,
+  Activity,
+  AlertCircle
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -37,43 +46,43 @@ interface InPageFeedbackCardProps {
 }
 
 const PATIENT_TAGS = [
-  '✨ Easy Touchscreen UI',
-  '🎙️ Great Voice & Language Support',
-  '📱 Fast Mobile QR Upload',
-  '⚡ Saved 30+ Mins in Queue',
-  '🧾 Clear Token & Instructions',
-  '🔊 Clear Audio Guidance',
-  '⚠️ Voice spoke too fast',
-  '⚠️ Need larger text size'
+  'Touchscreen Navigation',
+  'Voice & Language Support',
+  'Mobile QR Document Sync',
+  'Reduced Registration Time',
+  'Clear Token & Step Guidance',
+  'Audio Prompt Clarity',
+  'Adjust Voice Speed',
+  'Adjust Font Size'
 ];
 
 const DOCTOR_TAGS = [
-  '🩺 Spot-on Chief Complaint',
-  '📊 Accurate OCR Lab Extraction',
-  '⏱️ Saved 5-10 Mins per Patient',
-  '🌿 Precise AYUSH Dashavidha',
-  '🛡️ Reliable Red-Flag Triage',
-  '📝 Structured SOAP Summary',
-  '⚠️ Need shorter summary',
-  '⚠️ Missed subtle symptom detail'
+  'Accurate Chief Complaint',
+  'Precise OCR Lab Extraction',
+  'Reduced Documentation Time',
+  'Comprehensive AYUSH Assessment',
+  'Reliable Risk Triage',
+  'Structured SOAP Format',
+  'Concise Summary Preferred',
+  'Additional History Needed'
 ];
 
 const RATING_DESCRIPTIONS = {
   patient: [
-    { label: 'Select Rating', emoji: '✨', color: 'text-slate-400' },
-    { label: 'Difficult / Confusing', emoji: '😡', color: 'text-red-500' },
-    { label: 'Needs Improvement', emoji: '🙁', color: 'text-orange-500' },
-    { label: 'Okay / Average', emoji: '😐', color: 'text-amber-500' },
-    { label: 'Smooth & Easy', emoji: '😊', color: 'text-teal-600' },
-    { label: 'Super Fast & Intuitive!', emoji: '🤩', color: 'text-emerald-600' }
+    { label: 'Select Rating', color: 'text-slate-400' },
+    { label: 'Difficult / Needs Improvement', color: 'text-red-600' },
+    { label: 'Below Expectations', color: 'text-amber-600' },
+    { label: 'Satisfactory / Standard', color: 'text-slate-700' },
+    { label: 'Clear & Efficient', color: 'text-teal-700' },
+    { label: 'Excellent & Intuitive', color: 'text-emerald-700' }
   ],
   doctor: [
-    { label: 'Select Rating', emoji: '🩺', color: 'text-slate-400' },
-    { label: 'Inaccurate / Incomplete', emoji: '😡', color: 'text-red-500' },
-    { label: 'Missing Key Clinical Context', emoji: '🙁', color: 'text-orange-500' },
-    { label: 'Acceptable Baseline', emoji: '😐', color: 'text-amber-500' },
-    { label: 'High Clinical Precision', emoji: '😊', color: 'text-teal-600' },
-    { label: 'Exceptional Summary / Saved 10+ Mins', emoji: '🤩', color: 'text-emerald-600' }
+    { label: 'Select Rating', color: 'text-slate-400' },
+    { label: 'Inaccurate / Incomplete History', color: 'text-red-600' },
+    { label: 'Requires Extensive Manual Edits', color: 'text-amber-600' },
+    { label: 'Acceptable Baseline Intake', color: 'text-slate-700' },
+    { label: 'High Clinical Synthesis Accuracy', color: 'text-teal-700' },
+    { label: 'Exceptional Clinical Precision', color: 'text-emerald-700' }
   ]
 };
 
@@ -108,16 +117,15 @@ export const InPageFeedbackCard: React.FC<InPageFeedbackCardProps> = ({
     e.preventDefault();
     if (rating === 0) return;
 
-    // Trigger celebratory confetti
     try {
       confetti({
-        particleCount: 65,
-        spread: 70,
+        particleCount: 50,
+        spread: 60,
         origin: { y: 0.8 },
-        colors: type === 'patient' ? ['#0d9488', '#14b8a6', '#f59e0b', '#10b981'] : ['#0284c7', '#0f766e', '#6366f1', '#10b981']
+        colors: type === 'patient' ? ['#0d9488', '#14b8a6', '#0f766e'] : ['#0284c7', '#0f766e', '#1e293b']
       });
     } catch {
-      // Ignore if confetti fails
+      // Confetti fallback
     }
 
     const feedbackEntry: FeedbackData = {
@@ -151,15 +159,15 @@ export const InPageFeedbackCard: React.FC<InPageFeedbackCardProps> = ({
   return (
     <div className={`rounded-2xl border transition-all overflow-hidden ${
       type === 'patient' 
-        ? 'bg-gradient-to-br from-white via-teal-50/30 to-amber-50/20 border-teal-200 shadow-sm' 
-        : 'bg-gradient-to-br from-white via-slate-50 to-teal-50/30 border-slate-200 shadow-sm'
+        ? 'bg-gradient-to-br from-white via-teal-50/20 to-slate-50 border-teal-200 shadow-sm' 
+        : 'bg-gradient-to-br from-white via-slate-50 to-teal-50/20 border-slate-200 shadow-sm'
     } ${className}`}>
       
       {/* Top Header / Accordion Bar */}
       <div 
         onClick={() => setIsExpanded(!isExpanded)}
         className={`p-3.5 sm:p-4 flex items-center justify-between cursor-pointer select-none transition-colors ${
-          type === 'patient' ? 'hover:bg-teal-50/50' : 'hover:bg-slate-100/60'
+          type === 'patient' ? 'hover:bg-teal-50/40' : 'hover:bg-slate-100/60'
         }`}
       >
         <div className="flex items-center space-x-3">
@@ -175,7 +183,7 @@ export const InPageFeedbackCard: React.FC<InPageFeedbackCardProps> = ({
                   ? 'bg-teal-100 text-teal-800 border-teal-200' 
                   : 'bg-slate-200 text-slate-800 border-slate-300'
               }`}>
-                {type === 'patient' ? 'Patient Experience Rating' : 'Physician Clinical Evaluation'}
+                {type === 'patient' ? 'Patient Usability Evaluation' : 'Physician Clinical Evaluation'}
               </span>
               {isSubmitted && (
                 <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.2 rounded border border-emerald-200 flex items-center space-x-1">
@@ -186,8 +194,8 @@ export const InPageFeedbackCard: React.FC<InPageFeedbackCardProps> = ({
             </div>
             <h3 className="text-xs sm:text-sm font-bold text-slate-900 mt-0.5">
               {type === 'patient' 
-                ? 'How was your Kiosk Experience today?' 
-                : 'Evaluate AI Clinical Intake & SOAP Synthesis'}
+                ? 'Rate Kiosk Experience & Interface Usability' 
+                : 'Evaluate AI Clinical Intake & Structured Summary'}
             </h3>
           </div>
         </div>
@@ -200,7 +208,7 @@ export const InPageFeedbackCard: React.FC<InPageFeedbackCardProps> = ({
             </div>
           ) : (
             <span className="text-[11px] font-semibold text-slate-400 hidden sm:inline">
-              Zomato-Style 1-Tap Feedback
+              Feedback Survey
             </span>
           )}
           <button type="button" className="text-slate-400 hover:text-slate-600 p-1">
@@ -221,23 +229,23 @@ export const InPageFeedbackCard: React.FC<InPageFeedbackCardProps> = ({
               </div>
               <div>
                 <h4 className="text-sm font-bold text-emerald-950">
-                  {type === 'patient' ? 'Thank you for your feedback!' : 'Clinical evaluation recorded!'}
+                  {type === 'patient' ? 'Feedback Submitted Successfully' : 'Clinical Assessment Recorded'}
                 </h4>
                 <p className="text-xs text-emerald-800 max-w-md mx-auto mt-0.5">
                   {type === 'patient'
-                    ? 'Your rating helps our hospital improve touch kiosks, multi-language speech, and OPD queue management.'
-                    : `Your assessment of AI accuracy has been logged for EMR quality benchmarking (Attending: ${doctorName || 'Senior Consultant'}).`}
+                    ? 'Your feedback has been logged to support continuous quality improvements in OPD kiosk accessibility.'
+                    : `Your evaluation has been recorded for clinical intake auditing (Attending: ${doctorName || 'Senior Consultant'}).`}
                 </p>
               </div>
 
               <div className="inline-flex items-center space-x-2 bg-white px-3 py-1.5 rounded-lg border border-emerald-200 text-xs font-bold text-emerald-900 shadow-2xs">
-                <span>Rated:</span>
+                <span>Evaluation:</span>
                 <div className="flex text-amber-400">
                   {[1, 2, 3, 4, 5].map(s => (
                     <Star key={s} className={`w-3.5 h-3.5 ${s <= rating ? 'fill-amber-400 text-amber-400' : 'text-slate-200'}`} />
                   ))}
                 </div>
-                <span className="text-slate-500 font-normal">({ratingInfo.label})</span>
+                <span className="text-slate-600 font-medium">({ratingInfo.label})</span>
               </div>
 
               <div className="pt-1">
@@ -247,7 +255,7 @@ export const InPageFeedbackCard: React.FC<InPageFeedbackCardProps> = ({
                   className="text-[11px] font-bold text-teal-700 hover:underline inline-flex items-center space-x-1"
                 >
                   <RotateCcw className="w-3 h-3" />
-                  <span>Submit another review</span>
+                  <span>Submit Another Response</span>
                 </button>
               </div>
             </div>
@@ -255,7 +263,7 @@ export const InPageFeedbackCard: React.FC<InPageFeedbackCardProps> = ({
             /* Form Body */
             <form onSubmit={handleSubmit} className="space-y-4">
               
-              {/* Zomato-Style Star Bar with Large Interactive Buttons */}
+              {/* Star Rating Selection */}
               <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col items-center justify-center space-y-2">
                 <div className="flex items-center space-x-2 sm:space-x-3">
                   {[1, 2, 3, 4, 5].map((star) => {
@@ -267,7 +275,8 @@ export const InPageFeedbackCard: React.FC<InPageFeedbackCardProps> = ({
                         onClick={() => setRating(star)}
                         onMouseEnter={() => setHoverRating(star)}
                         onMouseLeave={() => setHoverRating(null)}
-                        className="p-1 sm:p-1.5 transition-transform hover:scale-125 focus:outline-none"
+                        className="p-1 sm:p-1.5 transition-transform hover:scale-120 focus:outline-none"
+                        title={`${star} Star${star > 1 ? 's' : ''}`}
                       >
                         <Star 
                           className={`w-7 h-7 sm:w-8 sm:h-8 transition-colors ${
@@ -281,16 +290,15 @@ export const InPageFeedbackCard: React.FC<InPageFeedbackCardProps> = ({
                   })}
                 </div>
 
-                <div className="flex items-center space-x-2 text-xs font-bold">
-                  <span className="text-base">{ratingInfo.emoji}</span>
+                <div className="text-xs font-bold">
                   <span className={ratingInfo.color}>{ratingInfo.label}</span>
                 </div>
               </div>
 
-              {/* Zomato-Style Multi-Select Quick Pills */}
+              {/* Multi-Select Quick Parameter Badges */}
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold text-slate-700 block uppercase tracking-wider">
-                  {type === 'patient' ? 'What stood out in your visit?' : 'Select Clinical Highlights / Feedback:'}
+                  {type === 'patient' ? 'Select Usability Attributes:' : 'Select Clinical Observations:'}
                 </label>
                 <div className="flex flex-wrap gap-1.5">
                   {availableTags.map((tag) => {
@@ -300,20 +308,21 @@ export const InPageFeedbackCard: React.FC<InPageFeedbackCardProps> = ({
                         key={tag}
                         type="button"
                         onClick={() => toggleTag(tag)}
-                        className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border flex items-center space-x-1.5 ${
                           isSelected
-                            ? 'bg-teal-700 text-white border-teal-800 shadow-2xs scale-102'
-                            : 'bg-white hover:bg-teal-50 text-slate-700 border-slate-200 hover:border-teal-300'
+                            ? 'bg-teal-700 text-white border-teal-800 shadow-2xs'
+                            : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300'
                         }`}
                       >
-                        {tag}
+                        {isSelected && <Check className="w-3 h-3 text-teal-200" />}
+                        <span>{tag}</span>
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Text Comment Area */}
+              {/* Text Observation Input */}
               <div className="space-y-1">
                 <textarea
                   value={comment}
@@ -322,18 +331,18 @@ export const InPageFeedbackCard: React.FC<InPageFeedbackCardProps> = ({
                   className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 bg-white text-slate-900 focus:outline-none focus:border-teal-700 placeholder:text-slate-400 leading-relaxed"
                   placeholder={
                     type === 'patient'
-                      ? 'Tell us what you loved or how we can make this kiosk easier for you...'
-                      : 'Doctor comments on AI intake accuracy, FHIR schema, or time saved in OPD...'
+                      ? 'Enter any suggestions regarding touch response, voice guidance, or registration speed...'
+                      : 'Enter clinical observations regarding history extraction, terminology mapping, or documentation...'
                   }
                 />
               </div>
 
-              {/* Submit Button */}
+              {/* Action Bar */}
               <div className="flex items-center justify-between pt-1">
                 <span className="text-[10px] text-slate-400">
                   {type === 'patient' 
-                    ? `Linked to Token #${tokenNumber || 'A-104'} • Anonymous & Secure` 
-                    : `Verified Clinician Feedback (${doctorName || 'Attending Physician'})`}
+                    ? `Token #${tokenNumber || 'A-104'} • Recorded Anonymously` 
+                    : `Verified Physician Entry (${doctorName || 'Attending Physician'})`}
                 </span>
 
                 <button
@@ -341,7 +350,7 @@ export const InPageFeedbackCard: React.FC<InPageFeedbackCardProps> = ({
                   className="px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs flex items-center space-x-1.5 shadow-sm transition-all"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  <span>Submit Rating</span>
+                  <span>Submit Evaluation</span>
                 </button>
               </div>
 

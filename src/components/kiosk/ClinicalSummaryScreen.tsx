@@ -347,7 +347,7 @@ export const ClinicalSummaryScreen: React.FC = () => {
 
       </div>
 
-      {/* In-Page Zomato-Style Kiosk Experience Feedback */}
+      {/* In-Page Patient Usability Evaluation */}
       <InPageFeedbackCard 
         type="patient"
         patientName={activePatient.name}
