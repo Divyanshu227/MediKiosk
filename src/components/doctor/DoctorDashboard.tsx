@@ -19,6 +19,7 @@ import {
   Tag
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { InPageFeedbackCard } from '../common/InPageFeedbackCard';
 import { Patient } from '../../types';
 
 interface DoctorDashboardProps {
@@ -536,6 +537,14 @@ export const DoctorDashboard: React.FC<DoctorDashboardProps> = ({ activeTab = 'd
         </div>
 
       </div>
+
+      {/* Doctor OPD Quality & Clinical Summary Feedback */}
+      <InPageFeedbackCard
+        type="doctor"
+        doctorName="OPD Clinician Workstation"
+        className="mt-4"
+        defaultExpanded={false}
+      />
 
     </div>
   );

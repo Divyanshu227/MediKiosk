@@ -39,6 +39,7 @@ import {
   Users
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { InPageFeedbackCard } from '../common/InPageFeedbackCard';
 import { MedicalDocument, TimelineEvent, ClinicalInfo, Patient } from '../../types';
 
 export const DoctorPatientSummary: React.FC = () => {
@@ -1085,6 +1086,16 @@ ABDM Tele-consult / OPD Gateway Certified`;
         </div>
 
       </div>
+
+      {/* In-Page Zomato-Style Doctor Clinical Precision Feedback */}
+      <InPageFeedbackCard
+        type="doctor"
+        patientName={patient.name}
+        tokenNumber={patient.tokenNumber}
+        doctorName={activeDoctor.name}
+        className="my-2"
+        defaultExpanded={false}
+      />
 
       {/* ========================================================= */}
       {/* MODAL 1: EDIT AI INTAKE REPORT DURING CONSULTATION */}

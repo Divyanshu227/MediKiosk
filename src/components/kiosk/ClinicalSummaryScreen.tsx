@@ -21,6 +21,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { InPageFeedbackCard } from '../common/InPageFeedbackCard';
 
 export const ClinicalSummaryScreen: React.FC = () => {
   const { 
@@ -345,6 +346,15 @@ export const ClinicalSummaryScreen: React.FC = () => {
         </div>
 
       </div>
+
+      {/* In-Page Zomato-Style Kiosk Experience Feedback */}
+      <InPageFeedbackCard 
+        type="patient"
+        patientName={activePatient.name}
+        tokenNumber={activePatient.tokenNumber}
+        className="my-1"
+        defaultExpanded={true}
+      />
 
       {/* Action Footer */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
