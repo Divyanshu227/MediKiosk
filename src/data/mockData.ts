@@ -2,7 +2,7 @@ import { Language, Patient, MedicalDocument, AyushAssessment } from '../types';
 
 export const SUPPORTED_LANGUAGES: Language[] = [
   { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', greeting: 'नमस्ते', flag: '🇮🇳', samplePrompt: 'मुझे तीन दिन से बुखार है और सिर में दर्द हो रहा है।' },
-  { code: 'en', name: 'English', nativeName: 'English', greeting: 'Hello', flag: '🌐', samplePrompt: 'I have had a fever and headache for three days.' },
+  { code: 'en', name: 'English', nativeName: 'English', greeting: 'Hello', flag: '🇮🇳', samplePrompt: 'I have had a fever and headache for three days.' },
   { code: 'bn', name: 'Bengali', nativeName: 'বাংলা', greeting: 'নমস্কার', flag: '🇮🇳', samplePrompt: 'আমার তিন দিন ধরে জ্বর এবং মাথা ব্যথা করছে।' },
   { code: 'te', name: 'Telugu', nativeName: 'తెలుగు', greeting: 'నమస్కారం', flag: '🇮🇳', samplePrompt: 'నాకు మూడు రోజులుగా జ్వరం మరియు తలనొప్పిగా ఉంది.' },
   { code: 'mr', name: 'Marathi', nativeName: 'मराठी', greeting: 'नमस्कार', flag: '🇮🇳', samplePrompt: 'मला तीन दिवसांपासून ताप आणि डोकेदुखी आहे.' },

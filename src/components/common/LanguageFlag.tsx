@@ -1,15 +1,13 @@
 import React from 'react';
-import { Globe } from 'lucide-react';
 import { LanguageCode } from '../../types';
 
 interface LanguageFlagProps {
-  code: LanguageCode | string;
+  code?: LanguageCode | string;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
 }
 
 export const LanguageFlag: React.FC<LanguageFlagProps> = ({ 
-  code, 
   className = '',
   size = 'md' 
 }) => {
@@ -19,22 +17,11 @@ export const LanguageFlag: React.FC<LanguageFlagProps> = ({
     lg: 'w-8 h-5.5'
   };
 
-  if (code === 'en') {
-    return (
-      <div 
-        className={`inline-flex items-center justify-center rounded bg-sky-50 border border-sky-200 text-sky-700 shadow-2xs ${sizeClasses[size]} ${className}`}
-        title="English / Global"
-      >
-        <Globe className="w-3.5 h-3.5 text-sky-600" />
-      </div>
-    );
-  }
-
-  // Official Indian National Tricolor (Tiranga) SVG
+  // Official Indian National Tricolor (Tiranga) SVG for all supported languages
   return (
     <div 
       className={`inline-flex rounded overflow-hidden shadow-2xs border border-slate-300/80 shrink-0 ${sizeClasses[size]} ${className}`}
-      title="India (National Language)"
+      title="India (National / Official Language)"
     >
       <svg 
         viewBox="0 0 45 30" 
