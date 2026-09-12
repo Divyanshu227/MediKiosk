@@ -14,6 +14,7 @@ import {
 import { useApp } from '../../context/AppContext';
 import { SUPPORTED_LANGUAGES } from '../../data/mockData';
 import { LanguageCode } from '../../types';
+import { LanguageFlag } from '../common/LanguageFlag';
 
 export const KioskHome: React.FC = () => {
   const { 
@@ -109,8 +110,8 @@ export const KioskHome: React.FC = () => {
                       : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-lg">{lang.flag}</span>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <LanguageFlag code={lang.code} size="md" />
                     {isSelected && (
                       <span className="w-4 h-4 rounded-full bg-teal-700 text-white flex items-center justify-center">
                         <Check className="w-2.5 h-2.5 stroke-[3]" />

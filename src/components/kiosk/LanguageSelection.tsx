@@ -10,6 +10,7 @@ import {
 import { useApp } from '../../context/AppContext';
 import { SUPPORTED_LANGUAGES } from '../../data/mockData';
 import { LanguageCode } from '../../types';
+import { LanguageFlag } from '../common/LanguageFlag';
 
 export const LanguageSelection: React.FC = () => {
   const { 
@@ -98,7 +99,7 @@ export const LanguageSelection: React.FC = () => {
                   </div>
                 )}
 
-                <span className="text-xl mb-1">{lang.flag}</span>
+                <LanguageFlag code={lang.code} size="md" className="mb-1.5" />
                 <div className="text-sm font-bold text-slate-900">{lang.nativeName}</div>
                 <div className="text-[11px] font-medium text-slate-500">{lang.name}</div>
                 <div className="text-[10px] text-teal-800 font-medium mt-1">"{lang.greeting}"</div>
