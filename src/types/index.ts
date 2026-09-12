@@ -209,6 +209,12 @@ export interface Patient {
   fhirBundle?: FhirResourceBundle;
   conversation: Message[];
   doctorReviewed?: boolean;
+  consultationCompleted?: boolean;
+  reviewedByDoctorName?: string;
+  reviewedByDoctorReg?: string;
+  doctorNotes?: string;
+  doctorPrescriptions?: string[];
+  signatureTimestamp?: string;
   intakeTimestamp: string;
   mobile?: string;
   bloodGroup?: string;

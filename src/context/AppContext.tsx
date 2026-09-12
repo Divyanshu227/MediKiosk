@@ -67,6 +67,13 @@ interface AppContextType {
   setSelectedDoctorPatient: (patient: Patient | null) => void;
   sendActivePatientToDoctor: () => void;
   markPatientAsReviewed: (patientId: string) => void;
+  updateDoctorPatientClinicalInfo: (patientId: string, updates: Partial<ClinicalInfo>, otherUpdates?: Partial<Patient>) => void;
+  completeAndSignConsultation: (
+    patientId: string,
+    doctorNotes: string,
+    prescriptions: string[],
+    signatureInfo?: { doctorName: string; regNumber: string; signatureData?: string }
+  ) => { nextPatient: Patient | null };
   updatePatientPriority: (patientId: string, priority: 'Normal' | 'High' | 'Urgent') => void;
 
   accessibility: AccessibilitySettings;
@@ -742,6 +749,98 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast(`Patient ${patientId} marked as reviewed.`);
   };
 
+  const updateDoctorPatientClinicalInfo = (patientId: string, updates: Partial<ClinicalInfo>, otherUpdates?: Partial<Patient>) => {
+    setPatientQueue(prev => prev.map(p => {
+      if (p.id === patientId) {
+        return {
+          ...p,
+          ...otherUpdates,
+          chiefComplaint: updates.chiefComplaint !== undefined ? updates.chiefComplaint : p.chiefComplaint,
+          clinicalInfo: {
+            ...p.clinicalInfo,
+            ...updates
+          }
+        };
+      }
+      return p;
+    }));
+
+    if (selectedDoctorPatient?.id === patientId) {
+      setSelectedDoctorPatient(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          ...otherUpdates,
+          chiefComplaint: updates.chiefComplaint !== undefined ? updates.chiefComplaint : prev.chiefComplaint,
+          clinicalInfo: {
+            ...prev.clinicalInfo,
+            ...updates
+          }
+        };
+      });
+    }
+
+    showToast('AI Intake Report updated by Physician.');
+  };
+
+  const completeAndSignConsultation = (
+    patientId: string,
+    doctorNotes: string,
+    prescriptions: string[],
+    signatureInfo?: { doctorName: string; regNumber: string; signatureData?: string }
+  ): { nextPatient: Patient | null } => {
+    const docName = signatureInfo?.doctorName || activeDoctor.name;
+    const docReg = signatureInfo?.regNumber || activeDoctor.regNumber;
+    const timestamp = new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(new Date());
+
+    let nextPatientFound: Patient | null = null;
+
+    setPatientQueue(prev => {
+      const updated = prev.map(p => {
+        if (p.id === patientId) {
+          return {
+            ...p,
+            doctorReviewed: true,
+            consultationCompleted: true,
+            status: 'Complete' as const,
+            reviewedByDoctorName: docName,
+            reviewedByDoctorReg: docReg,
+            doctorNotes: doctorNotes,
+            doctorPrescriptions: prescriptions,
+            signatureTimestamp: timestamp
+          };
+        }
+        return p;
+      });
+
+      // Find next unreviewed patient in queue
+      nextPatientFound = updated.find(p => !p.doctorReviewed && p.id !== patientId) || null;
+      return updated;
+    });
+
+    if (selectedDoctorPatient?.id === patientId) {
+      setSelectedDoctorPatient(prev => prev ? {
+        ...prev,
+        doctorReviewed: true,
+        consultationCompleted: true,
+        status: 'Complete' as const,
+        reviewedByDoctorName: docName,
+        reviewedByDoctorReg: docReg,
+        doctorNotes: doctorNotes,
+        doctorPrescriptions: prescriptions,
+        signatureTimestamp: timestamp
+      } : null);
+    }
+
+    return { nextPatient: nextPatientFound };
+  };
+
   const updatePatientPriority = (patientId: string, priority: 'Normal' | 'High' | 'Urgent') => {
     setPatientQueue(prev => prev.map(p => {
       if (p.id === patientId) {
@@ -926,6 +1025,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setSelectedDoctorPatient,
         sendActivePatientToDoctor,
         markPatientAsReviewed,
+        updateDoctorPatientClinicalInfo,
+        completeAndSignConsultation,
         updatePatientPriority,
         accessibility,
         updateAccessibility,
